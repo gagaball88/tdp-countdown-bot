@@ -5,10 +5,10 @@ to run the bot, download this repository, add pictures to the "pictures" folder,
 
 ls | sed 's/.*/"&",/'
 
-and add the output to the pictures.js file in /src/databases.
+and add the output to the one of the collection*.js files in /src/databases.
 
 add your twitter keys to the /src/config/config.env.test file and follow further instructions inside that file.
 
-go to the root folder and run npm install
+go to the root folder (with the package.json file) and run npm install
 
 then run npm start
