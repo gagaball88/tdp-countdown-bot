@@ -6,7 +6,7 @@ const paths = [
 ]
 
 
-exports.randomPicture = function() {
+export default function randomPicture() {
     let randomNumber = Math.floor(Math.random() * paths.length);
     return paths[randomNumber];
 }
