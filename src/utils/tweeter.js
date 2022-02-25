@@ -1,15 +1,19 @@
-const sendTweet = require("./sendTweet");
-const messageBuilder = require("./messageBuilder");
-const tools = require("./tools");
+import sendTweet from"./sendTweet.js";
+import messageBuilder from"./messageBuilder.js";
+import refreshPic from "./refreshPic.js";
+import player from "play-sound";
+import isOver from "./isOver.js";
 
-exports.send = async function(countdownDay, countdownMonth, countdownYear, message1, message2, messageEnd, pictureSlot) {
-    let picture = tools.refreshPic(pictureSlot);
-    let imageData = tools.getImageData(picture);
+export default async function tweeter(countdownDay, countdownMonth, countdownYear, message1, message2, messageEnd, pictureEnd, mode, accuracy, dayCount, pictureSlot) {
 
-    const diffTime = tools.calcTimeDifference(countdownDay, countdownMonth, countdownYear, pictureSlot);
+    let picture = refreshPic(pictureSlot);
 
-    let message = messageBuilder.countdownMessage(diffTime, message1, message2, messageEnd);
+    if (mode === 'countdown' && isOver()) picture = pictureEnd;
 
-    await sendTweet.tweet(message, imageData);
-    //console.log(message);
+    let message = messageBuilder(countdownDay, countdownMonth, countdownYear, mode, accuracy, dayCount, message1, message2, messageEnd);
+
+    await sendTweet(message, picture);
+    player().play('../sounds/notify.mp3');
+
+    //console.log(message + " " + picture);
 }

@@ -1,26 +1,20 @@
-const Twit = require("twitter");
+import {config} from "../config/config.js";
+import logger from "./logger.js";
 
-const config = require("../config/config.js");
+import {TwitterApi} from "twitter-api-v2";
 
-const T = new Twit(config);
 
-exports.tweet = function (message, imageData) {
-    return T.post("media/upload", {media: imageData}, function (error, media, response) {
-        if (error) {
-            console.log(error)
-        } else {
-            const status = {
-                status: message,
-                media_ids: media.media_id_string
-            }
+const client = new TwitterApi(config);
 
-            T.post("statuses/update", status, function (error, tweet, response) {
-                if (error) {
-                    console.log(error)
-                } else {
-                    console.log("Successfully sent tweet: " + message)
-                }
-            })
-        }
-    })
+
+export default async function sendTweet(message, imagePath) {
+    const mediaId = await Promise.all([
+
+        client.v1.uploadMedia(imagePath),
+
+    ]);
+
+    await client.v1.tweet(message, { media_ids: mediaId });
+    logger("Tweet sent successfully: " + message);
+
 }
