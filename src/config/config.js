@@ -1,14 +1,16 @@
-const path = require('path')
-const dotenv = require('dotenv')
-require('dotenv').config();
+import dotenv from 'dotenv';
 
 dotenv.config({ path: './config/config.env' })
 
 //exports the keys
-module.exports = {
-    consumer_key : process.env.API_KEY,
-    consumer_secret : process.env.API_SECRET_KEY,
-    access_token : process.env.ACCESS_TOKEN,
-    access_token_key: process.env.ACCESS_TOKEN,
-    access_token_secret : process.env.ACCESS_TOKEN_SECRET
+export let config = {
+    appKey : process.env.API_KEY,
+
+    appSecret : process.env.API_SECRET_KEY,
+
+    accessToken : process.env.ACCESS_TOKEN,
+
+    accessSecret : process.env.ACCESS_TOKEN_SECRET,
+
+    //bearerToken : process.env.BEARER_TOKEN
 }
