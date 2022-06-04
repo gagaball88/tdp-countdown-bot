@@ -1,6 +1,6 @@
 {
   "name": "tdp-countdown-bot",
-  "version": "2.4.0",
+  "version": "2.5.3",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -10,12 +10,13 @@
   "author": "gagaball88",
   "license": "",
   "dependencies": {
-    "dotenv": "^16.0.0",
+    "dotenv": "^16.0.1",
     "esc-exit": "^3.0.0",
-    "moment": "^2.29.1",
+    "moment": "^2.29.3",
     "node-cron": "^3.0.0",
-    "twitter-api-v2": "^1.10.0",
+    "twitter-api-v2": "^1.12.2",
     "play-sound": "^1.1.5",
-    "luxon": "^2.3.1"
+    "luxon": "^2.4.0",
+    "humanize-duration": "^3.27.2"
   }
 }
