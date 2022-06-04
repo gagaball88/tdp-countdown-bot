@@ -1,3 +1,4 @@
-fixed time waited, changed time measurement to luxon
+replace message generation mechanism with humanize-duration
+Update dependencies
 
 other minor changes & improvements
