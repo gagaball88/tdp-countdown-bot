@@ -1,4 +1,3 @@
-replace message generation mechanism with humanize-duration
-Update dependencies
+bot has gained the ability for adjustable slot count! Add or remove as many slots as you want.
 
 other minor changes & improvements
