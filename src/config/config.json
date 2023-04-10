@@ -1,4 +1,5 @@
 {
+  "debuggingEnv": false,
   "slots":
   [
     {
@@ -6,16 +7,16 @@
       "day": 1,
       "month": 8,
       "year": 2023,
-      "message1": "This text message counts down to the 1st of August 2023. That's in",
-      "message2": " This is a test message.",
+      "message1": "'Puzzle House' will release in ",
+      "message2": " on the 1st of August 2023!",
       "messageEnd": "Test 1 expired!",
-      "pictureEnd": "Path to Picture",
+      "pictureEnd": "fuckface 1",
       "active": true,
       "mode": "countdown",
       "accuracy": 5,
       "dayCount": true,
       "pictureSlot": 2,
-      "postTime": 21
+      "postTime": 20
     },
 
     {
@@ -23,9 +24,9 @@
       "day": 3,
       "month": 11,
       "year": 2022,
-      "message1": "This text message counts up from the 3rd of November 2022. That was ",
-      "message2": "ago.",
-      "messageEnd": "it never ends....",
+      "message1": "We have been waiting",
+      "message2": " for #TheDragonPrince Season 5 so far!",
+      "messageEnd": "",
       "pictureEnd": "",
       "active": true,
       "mode": "countup",
@@ -34,6 +35,61 @@
       "pictureSlot": 2,
       "postTime": 9
 
+    },
+
+    {
+      "hour": 9,
+      "day": 31,
+      "month": 10,
+      "year": 2023,
+      "message1": "In",
+      "message2": " on the 31st of October 2023, the Book 3 Novelization 'Sun' of #TheDragonPrince will release!",
+      "messageEnd": "",
+      "pictureEnd": "",
+      "active": true,
+      "mode": "countdown",
+      "accuracy": 5,
+      "dayCount": true,
+      "pictureSlot": 2,
+      "postTime": 3
+
+    },
+    
+    {
+      "hour": 9,
+      "day": 31,
+      "month": 8,
+      "year": 2023,
+      "message1": "The 5th Season of #TheDragonPrince will release in ",
+      "message2": " at the very latest, based on the definition of 'summer' in the northern hemisphere!",
+      "messageEnd": "Test 1 expired!",
+      "pictureEnd": "fuckface 1",
+      "active": true,
+      "mode": "countdown",
+      "accuracy": 5,
+      "dayCount": true,
+      "pictureSlot": 2,
+      "postTime": 16
+    },
+
+
+    {
+      "hour": 11,
+      "day": 10,
+      "month": 4,
+      "year": 2023,
+      "message1": "This is a test message. If it works, an identical message was posted\n\non Twitter @countdowntdp,\non Mastodon @countdowntdp@mastodon.social and also\non Tumblr at https://www.tumblr.com/countdowntdp.\n\nTest countdown:",
+      "message2": "",
+      "messageEnd": "",
+      "pictureEnd": "./pictures/End.jpeg",
+      "active": false,
+      "mode": "countdown",
+      "accuracy": 5,
+      "dayCount": true,
+      "pictureSlot": 4,
+      "postTime": 15
+
     }
+
   ]
 }

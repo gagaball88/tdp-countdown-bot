@@ -35,3 +35,4 @@ export let tumblrConfig = {
     token_secret: process.env.TUMBLR_TOKEN_SECRET
 }
 
+export let discordConfig = process.env.DISCORD_TOKEN

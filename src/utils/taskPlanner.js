@@ -38,6 +38,7 @@ export default function taskPlanner(s) {
 
     if (!over && ms < 3600000 && ms >= 300000) {
         if (minute === 0 || minute % 5 === 0) {
+        //if (minute === 0 || minute % 5 === 0) { 
             //console.log("activate option 3 (every 5 minutes)");
 
             poster(s);

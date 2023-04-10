@@ -1,9 +1,16 @@
-import { tumblrConfig, twitterConfig, mastodonConfig } from "../config/credentials.js";
+import { tumblrConfig, twitterConfig, mastodonConfig, discordConfig } from "../config/credentials.js";
 import logger from "./logger.js";
 import { login } from 'masto';
 import fs from 'fs'
 import tumblr from 'tumblr.js';
 import {TwitterApi} from "twitter-api-v2";
+//import { Client, Intents } from "discord.js";
+
+const delay = ms => new Promise(res => setTimeout(res, ms));
+
+import discordImport, { GatewayIntentBits } from 'discord.js';
+import path from "path";
+const { Client, Intents, AttachmentBuilder } = discordImport;
 
 
 const twitterClient = new TwitterApi(twitterConfig);
@@ -11,6 +18,12 @@ const twitterClient = new TwitterApi(twitterConfig);
 const mastodonClient = await login(mastodonConfig);
 
 const tumblrClient = tumblr.createClient(tumblrConfig);
+
+const discordClient=new Client({ intents: [GatewayIntentBits.Guilds] });
+
+discordClient.login(discordConfig);
+
+
 
 //mastodonClient = await mastodonLogin(credentials.mastodonConfig);
 
@@ -29,12 +42,14 @@ export async function sendTweet(message, imagePath) {
 
 export async function sendMastodon(message, imagePath) {
 
-    const attachment = await mastodonClient.mediaAttachments.create({
-        file: fs.createReadStream(imagePath),
+    const attachment = await mastodonClient.v2.mediaAttachments.create({
+        file: new Blob([fs.readFileSync(imagePath)]),
         description: 'randomly chosen from the TDP Countdown bot image library',
       });
 
-    const status = await mastodonClient.statuses.create({
+      const attachment2 = 0;
+
+    const status = await mastodonClient.v1.statuses.create({
         status: message,
         visibility: 'public',
         mediaIds: [attachment.id],
@@ -58,4 +73,31 @@ export async function sendTumblr(message, imagePath) {
 
   logger("Tumblr post sent successfully: " + message + " " + imagePath);
 
+}
+
+
+export async function sendDiscord(message, imagePath) {
+
+  const lastIndex = imagePath.lastIndexOf('/');
+
+  //const path = String(imagePath).substring(0, lastIndex);
+
+  const image = String(imagePath).substring(lastIndex + 1);
+
+  const attachment = new AttachmentBuilder(path, { name: image })
+
+  discordClient.guilds.cache.forEach(async (guild)=>{
+    const channel = guild.channels.cache.find(channel => channel.name === 'tdp-countdown-bot')
+
+    await channel.send({
+      content: message,
+      files: [{
+        attachment: imagePath,
+        name: image,
+        description: 'TDP Pic'
+      }]
+    })
+    })
+
+  logger("Discord message sent successfully: " + message + " " + imagePath);
 }
