@@ -14,12 +14,12 @@
     "esc-exit": "^3.0.0",
     "moment": "^2.29.4",
     "node-cron": "^3.0.2",
-    "twitter-api-v2": "^1.14.2",
+    "twitter-api-v2": "^1.14.3",
     "play-sound": "^1.1.5",
     "luxon": "^3.3.0",
     "humanize-duration": "^3.28.0",
     "tumblr.js": "^3.0.0",
-    "masto": "^5.11.1",
-    "discord.js": "^14.9.0"
+    "masto": "^5.11.3",
+    "discord.js": "^14.11.0"
   }
 }

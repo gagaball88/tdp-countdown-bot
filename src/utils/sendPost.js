@@ -35,7 +35,7 @@ export async function sendTweet(message, imagePath) {
 
     ]);
 
-    await twitterClient.v1.tweet(message, { media_ids: mediaId });
+    await twitterClient.v2.tweet({text: message, media: { media_ids: mediaId }});
     logger("Tweet sent successfully: " + message + " " + imagePath);
 
 }
