@@ -104,5 +104,5 @@ export async function sendDiscord(message, imagePath) {
 
   })
 
-  logger("Discord messages sent");
+  console.log("Discord messages sent");
 }
