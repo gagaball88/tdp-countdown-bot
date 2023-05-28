@@ -22,6 +22,9 @@ export default async function initPost(countdownHour, countdownDay, countdownMon
     let debuggingEnv = config.debuggingEnv
 
     if (!debuggingEnv) {
+
+        logger('Sending message: ' + message + '\nPicture: ' + picture + '\n..........')
+
         try {
             await sendTweet(message, picture);
             //logger("Message: " + message + "\n\nPicture : " + picture + "\n")

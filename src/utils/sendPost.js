@@ -4,13 +4,12 @@ import { login } from 'masto';
 import fs from 'fs'
 import tumblr from 'tumblr.js';
 import {TwitterApi} from "twitter-api-v2";
-//import { Client, Intents } from "discord.js";
 
 const delay = ms => new Promise(res => setTimeout(res, ms));
 
 import discordImport, { GatewayIntentBits } from 'discord.js';
 import path from "path";
-const { Client, Intents, AttachmentBuilder } = discordImport;
+const { Client, AttachmentBuilder } = discordImport;
 
 
 const twitterClient = new TwitterApi(twitterConfig);
@@ -19,13 +18,9 @@ const mastodonClient = await login(mastodonConfig);
 
 const tumblrClient = tumblr.createClient(tumblrConfig);
 
-const discordClient=new Client({ intents: [GatewayIntentBits.Guilds] });
+const discordClient = new Client({ intents: [GatewayIntentBits.Guilds] });
 
 discordClient.login(discordConfig);
-
-
-
-//mastodonClient = await mastodonLogin(credentials.mastodonConfig);
 
 
 export async function sendTweet(message, imagePath) {
@@ -36,7 +31,7 @@ export async function sendTweet(message, imagePath) {
     ]);
 
     await twitterClient.v2.tweet({text: message, media: { media_ids: mediaId }});
-    logger("Tweet sent successfully: " + message + " " + imagePath);
+  console.log("Tweet sent");
 
 }
 
@@ -55,7 +50,7 @@ export async function sendMastodon(message, imagePath) {
         mediaIds: [attachment.id],
       });
 
-    logger("Mastodon post sent successfully: " + message + " " + imagePath);
+    console.log("Mastodon post sent");
 
 }
 
@@ -71,7 +66,7 @@ export async function sendTumblr(message, imagePath) {
     }
   })
 
-  logger("Tumblr post sent successfully: " + message + " " + imagePath);
+  console.log("Tumblr post sent");
 
 }
 
@@ -89,15 +84,25 @@ export async function sendDiscord(message, imagePath) {
   discordClient.guilds.cache.forEach(async (guild)=>{
     const channel = guild.channels.cache.find(channel => channel.name === 'tdp-countdown-bot')
 
-    await channel.send({
+    let serverName = guild.name;
+    console.log("...sending on Server: " + serverName)
+    
+    try {
+      await channel.send({
       content: message,
       files: [{
         attachment: imagePath,
         name: image,
         description: 'TDP Pic'
-      }]
-    })
-    })
+        }]
+      })
+    }
 
-  logger("Discord message sent successfully: " + message + " " + imagePath);
+    catch(e) {
+      console.log(e);
+    }
+
+  })
+
+  logger("Discord messages sent");
 }
