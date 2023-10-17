@@ -1,9 +1,10 @@
-import { tumblrConfig, twitterConfig, mastodonConfig, discordConfig } from "../config/credentials.js";
+import { tumblrConfig, twitterConfig, mastodonConfig, discordConfig, blueskyConfig } from "../config/credentials.js";
 import logger from "./logger.js";
 import { login } from 'masto';
 import fs from 'fs'
 import tumblr from 'tumblr.js';
 import {TwitterApi} from "twitter-api-v2";
+import { BskyAgent } from '@atproto/api'
 
 const delay = ms => new Promise(res => setTimeout(res, ms));
 
@@ -14,13 +15,19 @@ const { Client, AttachmentBuilder } = discordImport;
 
 const twitterClient = new TwitterApi(twitterConfig);
 
-const mastodonClient = await login(mastodonConfig);
+const blueskyClient = new BskyAgent({
+  service: 'https://bsky.app/'
+})
+await blueskyClient.login(blueskyConfig)
+
+const mastodonClient = createRestAPIClient(mastodonConfig);
 
 const tumblrClient = tumblr.createClient(tumblrConfig);
 
 const discordClient = new Client({ intents: [GatewayIntentBits.Guilds] });
 
 discordClient.login(discordConfig);
+
 
 
 export async function sendTweet(message, imagePath) {
@@ -33,6 +40,29 @@ export async function sendTweet(message, imagePath) {
     await twitterClient.v2.tweet({text: message, media: { media_ids: mediaId }});
   console.log("Tweet sent");
 
+}
+
+export async function sendBluesky(message, imagePath) {
+  let format = id.substr(id.length - 3);
+  let picUpload
+  if (format === "png") {
+    picUpload = await agent.uploadBlob(imagePath, {encoding: "image/png"});
+  }
+  else if (format === "jpg" || format === "jpeg" ) {
+    picUpload = await agent.uploadBlob(imagePath, {encoding: "image/jpg"});
+  }
+  await agent.post({
+    text: message,
+    embed: {
+        images: [
+            {
+                image: picUpload.data.blob,
+                alt: "",
+            },
+        ],
+      $type: "app.bsky.embed.images",
+    },
+  });
 }
 
 export async function sendMastodon(message, imagePath) {
@@ -56,15 +86,25 @@ export async function sendMastodon(message, imagePath) {
 
 export async function sendTumblr(message, imagePath) {
 
-
   let file = fs.createReadStream(imagePath)
   let tags = "the dragon prince, TDP Countdown"
 
-  const status = tumblrClient.createPhotoPost("countdowntdp",{ data: file, caption: message, tags: tags }, function (err, data) {
-    if (err) {
-      console.error('client.createPhotoPost:', err)
-    }
-  })
+  let blogName = "countdowntdp"
+
+  await client.createPost(blogName, {
+    content: [
+      {
+        "type": "text",
+        "text": message
+      },
+      {
+        type: 'image',
+        media: file,
+        alt_text: 'random screenshot from The Dragon Prince'
+      }
+    ],
+    tags: [tags]
+  });
 
   console.log("Tumblr post sent");
 
@@ -105,4 +145,7 @@ export async function sendDiscord(message, imagePath) {
   })
 
   console.log("Discord messages sent");
+
+
+
 }

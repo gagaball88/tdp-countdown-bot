@@ -33,6 +33,14 @@ export let tumblrConfig = {
     token: process.env.TUMBLR_TOKEN,
 
     token_secret: process.env.TUMBLR_TOKEN_SECRET
+
+
 }
 
 export let discordConfig = process.env.DISCORD_TOKEN
+
+export let blueskyConfig = {
+    identifier: process.env.BLUESKY_IDENTIFIER,
+    
+    password: process.env.BLUESKY_PASSWORD
+}

@@ -1,4 +1,5 @@
 import { sendTweet } from"./sendPost.js";
+import { sendBluesky } from "./sendPost.js";
 import { sendMastodon } from"./sendPost.js";
 import { sendTumblr } from"./sendPost.js";
 import { sendDiscord } from"./sendPost.js";
@@ -34,6 +35,18 @@ export default async function initPost(countdownHour, countdownDay, countdownMon
         }
         catch(e) {
             logger('!!!WARNING!!!\n\nTweet not sent!\n\nPicture used:' + picture + '\n\nError log:')
+            console.log(e);
+        }
+
+        try {
+            await sendBluesky(message, picture);
+            //logger("Message: " + message + "\n\nPicture : " + picture + "\n")
+            player().play('./sounds/notify.mp3');
+
+            //throw 'MyException';
+        }
+        catch(e) {
+            logger('!!!WARNING!!!\n\nBluesky Post not sent!\n\nPicture used:' + picture + '\n\nError log:')
             console.log(e);
         }
 

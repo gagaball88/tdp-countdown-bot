@@ -10,16 +10,17 @@
   "author": "gagaball88",
   "license": "",
   "dependencies": {
-    "dotenv": "^16.0.3",
-    "esc-exit": "^3.0.0",
-    "moment": "^2.29.4",
-    "node-cron": "^3.0.2",
-    "twitter-api-v2": "^1.14.3",
-    "play-sound": "^1.1.5",
-    "luxon": "^3.3.0",
-    "humanize-duration": "^3.28.0",
-    "tumblr.js": "^3.0.0",
-    "masto": "^5.11.3",
-    "discord.js": "^14.11.0"
+    "dotenv": "16.3.1",
+    "esc-exit": "3.0.0",
+    "moment": "2.29.4",
+    "node-cron": "3.0.2",
+    "twitter-api-v2": "1.15.2",
+    "play-sound": "1.1.6",
+    "luxon": "3.4.3",
+    "humanize-duration": "3.30.0",
+    "tumblr.js": "4.0.1",
+    "masto": "6.3.1",
+    "discord.js": "14.13.0",
+    "@atproto/api": "^0.6.20"
   }
 }
