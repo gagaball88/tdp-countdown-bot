@@ -1,3 +1,4 @@
-fixed tweets (switch to api v2)
-
-other minor changes & improvements
+5.4.0
+- added Bluesky functionality
+- fixed text generation bug
+- updated dependencies
