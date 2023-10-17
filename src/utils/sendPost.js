@@ -1,10 +1,12 @@
 import { tumblrConfig, twitterConfig, mastodonConfig, discordConfig, blueskyConfig } from "../config/credentials.js";
 import logger from "./logger.js";
-import { login } from 'masto';
+import { createRestAPIClient } from 'masto';
 import fs from 'fs'
 import tumblr from 'tumblr.js';
 import {TwitterApi} from "twitter-api-v2";
-import { BskyAgent } from '@atproto/api'
+
+import Bsky from '@atproto/api'
+const { BskyAgent } = Bsky
 
 const delay = ms => new Promise(res => setTimeout(res, ms));
 
@@ -16,9 +18,10 @@ const { Client, AttachmentBuilder } = discordImport;
 const twitterClient = new TwitterApi(twitterConfig);
 
 const blueskyClient = new BskyAgent({
-  service: 'https://bsky.app/'
+  service: 'https://bsky.social'
 })
-await blueskyClient.login(blueskyConfig)
+try {await blueskyClient.login(blueskyConfig)}
+catch(e) {console.log(e)}
 
 const mastodonClient = createRestAPIClient(mastodonConfig);
 
@@ -43,15 +46,21 @@ export async function sendTweet(message, imagePath) {
 }
 
 export async function sendBluesky(message, imagePath) {
-  let format = id.substr(id.length - 3);
+
+  const file = Bun.file(imagePath);
+
+  const arrBuffer = await file.arrayBuffer();
+  const byteArray = new Uint8Array(arrBuffer);
+
+  let format = imagePath.substr(imagePath.length - 3);
   let picUpload
   if (format === "png") {
-    picUpload = await agent.uploadBlob(imagePath, {encoding: "image/png"});
+    picUpload = await blueskyClient.uploadBlob(byteArray, {encoding: "image/png"});
   }
-  else if (format === "jpg" || format === "jpeg" ) {
-    picUpload = await agent.uploadBlob(imagePath, {encoding: "image/jpg"});
+  else if (format === "jpg" || format === "peg" ) {
+    picUpload = await blueskyClient.uploadBlob(byteArray, {encoding: "image/jpg"});
   }
-  await agent.post({
+  await blueskyClient.post({
     text: message,
     embed: {
         images: [
