@@ -64,6 +64,8 @@ export async function sendBluesky(message, imagePath) {
       $type: "app.bsky.embed.images",
     },
   });
+
+  console.log("Bluesky post sent");
 }
 
 export async function sendMastodon(message, imagePath) {
