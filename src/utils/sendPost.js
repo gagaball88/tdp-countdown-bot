@@ -1,15 +1,10 @@
 import { tumblrConfig, twitterConfig, mastodonConfig, discordConfig, blueskyConfig } from "../config/credentials.js";
-import logger from "./logger.js";
 import { createRestAPIClient } from 'masto';
-import fs from 'fs'
+import fs from 'fs';
 import tumblr from 'tumblr.js';
 import {TwitterApi} from "twitter-api-v2";
-
-import Bsky from '@atproto/api'
-const { BskyAgent } = Bsky
-
-const delay = ms => new Promise(res => setTimeout(res, ms));
-
+import Bsky from '@atproto/api';
+const { BskyAgent } = Bsky;
 import discordImport, { GatewayIntentBits } from 'discord.js';
 import path from "path";
 const { Client, AttachmentBuilder } = discordImport;
@@ -19,7 +14,7 @@ const twitterClient = new TwitterApi(twitterConfig);
 
 const blueskyClient = new BskyAgent({
   service: 'https://bsky.social'
-})
+});
 try {await blueskyClient.login(blueskyConfig)}
 catch(e) {console.log(e)}
 
@@ -47,10 +42,7 @@ export async function sendTweet(message, imagePath) {
 
 export async function sendBluesky(message, imagePath) {
 
-  const file = Bun.file(imagePath);
-
-  const arrBuffer = await file.arrayBuffer();
-  const byteArray = new Uint8Array(arrBuffer);
+  const byteArray = fs.readFileSync(imagePath);
 
   let format = imagePath.substr(imagePath.length - 3);
   let picUpload
@@ -76,18 +68,16 @@ export async function sendBluesky(message, imagePath) {
 
 export async function sendMastodon(message, imagePath) {
 
-    const attachment = await mastodonClient.v2.mediaAttachments.create({
-        file: new Blob([fs.readFileSync(imagePath)]),
-        description: 'randomly chosen from the TDP Countdown bot image library',
-      });
-
-      const attachment2 = 0;
+    const attachment1 = await mastodonClient.v2.media.create({
+      file: new Blob([fs.readFileSync(imagePath)]),
+      description: "randomly chosen from the TDP Countdown bot image library",
+    });  
 
     const status = await mastodonClient.v1.statuses.create({
-        status: message,
-        visibility: 'public',
-        mediaIds: [attachment.id],
-      });
+      status: message,
+      visibility: "public",
+      mediaIds: [attachment1.id],
+    });
 
     console.log("Mastodon post sent");
 
@@ -100,7 +90,7 @@ export async function sendTumblr(message, imagePath) {
 
   let blogName = "countdowntdp"
 
-  await client.createPost(blogName, {
+  await tumblrClient.createPost(blogName, {
     content: [
       {
         "type": "text",
@@ -123,8 +113,6 @@ export async function sendTumblr(message, imagePath) {
 export async function sendDiscord(message, imagePath) {
 
   const lastIndex = imagePath.lastIndexOf('/');
-
-  //const path = String(imagePath).substring(0, lastIndex);
 
   const image = String(imagePath).substring(lastIndex + 1);
 

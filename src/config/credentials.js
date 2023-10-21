@@ -19,9 +19,9 @@ export let twitterConfig = {
 };
 
 export let mastodonConfig = {
-    url : process.env.MASTODON_URL,
+    url: process.env.MASTODON_URL,
 
-    accessToken : process.env.MASTODON_ACCESS_TOKEN,
+    accessToken: process.env.MASTODON_ACCESS_TOKEN
 
 }
 
