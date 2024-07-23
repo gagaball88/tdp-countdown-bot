@@ -44,3 +44,9 @@ export let blueskyConfig = {
     
     password: process.env.BLUESKY_PASSWORD
 }
+
+export let threadsConfig = {
+    username: process.env.THREADS_IDENTIFIER,
+    
+    password: process.env.THREADS_PASSWORD
+}
