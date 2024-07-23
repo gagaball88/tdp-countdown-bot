@@ -21,6 +21,7 @@
     "tumblr.js": "4.0.1",
     "masto": "6.3.1",
     "discord.js": "14.13.0",
-    "@atproto/api": "^0.6.20"
+    "@atproto/api": "^0.6.20",
+    "threads-api": "^1.6.3"
   }
 }
