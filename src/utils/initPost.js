@@ -3,6 +3,7 @@ import { sendBluesky } from "./sendPost.js";
 import { sendMastodon } from"./sendPost.js";
 import { sendTumblr } from"./sendPost.js";
 import { sendDiscord } from"./sendPost.js";
+import { sendThreads } from"./sendPost.js";
 import messageBuilder from"./messageBuilder.js";
 import refreshPic from "./refreshPic.js";
 import player from "play-sound";
@@ -84,6 +85,18 @@ export default async function initPost(countdownHour, countdownDay, countdownMon
         }
         catch(e) {
             logger('!!!WARNING!!!\n\nDiscord message not sent!\n\nPicture used:' + picture + '\n\nError log:')
+            console.log(e);
+        }
+
+        try {
+            await sendThreads(message, picture);
+            //logger("Message: " + message + "\n\nPicture : " + picture + "\n")
+            player().play('./sounds/notify.mp3');
+
+            //throw 'MyException';
+        }
+        catch(e) {
+            logger('!!!WARNING!!!\n\nThreads message not sent!\n\nPicture used:' + picture + '\n\nError log:')
             console.log(e);
         }
     }
