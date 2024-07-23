@@ -1,3 +1,6 @@
+5.6.0
+- added Threads implementation
+
 5.5.2
 - fixed a bug where at exactly one year there wouldn't be a time in the message
 
