@@ -82,7 +82,7 @@ export default function messageBuilder(countdownHour, countdownDay, countdownMon
         }
 
         if (accuracy === 5) {
-            if(fullDays > 365) {
+            if(fullDays >= 365) {
                 status += humanize(fullMS, {
                     language: "en",
                     serialComma: false,
