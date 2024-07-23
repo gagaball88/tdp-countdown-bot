@@ -1,9 +1,10 @@
-import { tumblrConfig, twitterConfig, mastodonConfig, discordConfig, blueskyConfig } from "../config/credentials.js";
+import { tumblrConfig, twitterConfig, mastodonConfig, discordConfig, blueskyConfig, threadsConfig } from "../config/credentials.js";
 import { createRestAPIClient } from 'masto';
 import fs from 'fs';
 import tumblr from 'tumblr.js';
 import {TwitterApi} from "twitter-api-v2";
 import Bsky from '@atproto/api';
+import { ThreadsAPI } from 'threads-api';
 const { BskyAgent } = Bsky;
 import discordImport, { GatewayIntentBits } from 'discord.js';
 import path from "path";
@@ -25,6 +26,10 @@ const tumblrClient = tumblr.createClient(tumblrConfig);
 const discordClient = new Client({ intents: [GatewayIntentBits.Guilds] });
 
 discordClient.login(discordConfig);
+
+const threadsClient = new ThreadsAPI(threadsConfig);
+
+
 
 
 
@@ -146,5 +151,12 @@ export async function sendDiscord(message, imagePath) {
   console.log("Discord messages sent");
 
 
+}
+
+export async function sendThreads(message, imagePath) {
+
+  await threadsClient.publish({ text: message, attachment: { path: imagePath } });
+
+  console.log("Threads message sent");
 
 }
