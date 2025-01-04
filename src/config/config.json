@@ -1,5 +1,5 @@
 {
-  "debuggingEnv": false,
+  "debuggingEnv": true,
   "slots":
   [
     {
@@ -74,20 +74,20 @@
 
 
     {
-      "hour": 11,
-      "day": 10,
-      "month": 4,
-      "year": 2023,
+      "hour": 22,
+      "day": 4,
+      "month": 1,
+      "year": 2025,
       "message1": "This is a test message. If it works, an identical message was posted\n\non Twitter @countdowntdp,\non Mastodon @countdowntdp@mastodon.social and also\non Tumblr at https://www.tumblr.com/countdowntdp.\n\nTest countdown:",
       "message2": "",
       "messageEnd": "",
       "pictureEnd": "./pictures/End.jpeg",
-      "active": false,
+      "active": true,
       "mode": "countdown",
       "accuracy": 5,
       "dayCount": true,
-      "pictureSlot": 4,
-      "postTime": 15
+      "pictureSlot": "s1e6,s1e1",
+      "postTime": 17
 
     }
 

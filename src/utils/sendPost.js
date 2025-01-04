@@ -3,9 +3,8 @@ import { createRestAPIClient } from 'masto';
 import fs from 'fs';
 import tumblr from 'tumblr.js';
 import {TwitterApi} from "twitter-api-v2";
-import Bsky from '@atproto/api';
-import { ThreadsAPI } from 'threads-api';
-const { BskyAgent } = Bsky;
+import { AtpAgent } from '@atproto/api'
+//import { CredentialSession } from "@atproto/api";
 import discordImport, { GatewayIntentBits } from 'discord.js';
 import path from "path";
 const { Client, AttachmentBuilder } = discordImport;
@@ -13,7 +12,7 @@ const { Client, AttachmentBuilder } = discordImport;
 
 const twitterClient = new TwitterApi(twitterConfig);
 
-const blueskyClient = new BskyAgent({
+const blueskyClient = new AtpAgent({
   service: 'https://bsky.social'
 });
 try {await blueskyClient.login(blueskyConfig)}
@@ -27,8 +26,7 @@ const discordClient = new Client({ intents: [GatewayIntentBits.Guilds] });
 
 discordClient.login(discordConfig);
 
-const threadsClient = new ThreadsAPI(threadsConfig);
-
+//const threadsClient = new ThreadsAPI(threadsConfig);
 
 
 
@@ -153,10 +151,10 @@ export async function sendDiscord(message, imagePath) {
 
 }
 
-export async function sendThreads(message, imagePath) {
+/*export async function sendThreads(message, imagePath) {
 
   await threadsClient.publish({ text: message, attachment: { path: imagePath } });
 
   console.log("Threads message sent");
 
-}
+}*/

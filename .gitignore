@@ -106,3 +106,6 @@ dist
 #pictures
 .png
 .jpeg
+package-lock.json
+src/config/credentials.env
+src/temp/

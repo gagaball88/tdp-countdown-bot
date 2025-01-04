@@ -50,3 +50,15 @@ export let threadsConfig = {
     
     password: process.env.THREADS_PASSWORD
 }
+
+export let pgConfig = {
+    host: process.env.PG_HOST_IP, // PostgreSQL server IP
+    
+    port: process.env.PG_HOST_PORT,          // Default PostgreSQL port
+   
+    user: process.env.PG_USERNAME,  // Replace with your username
+    
+    password: process.env.PG_PASSWORD, // Replace with your password
+    
+    database: process.env.PG_DATABASE,      // Your database name
+}
