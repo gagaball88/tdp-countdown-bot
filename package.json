@@ -1,6 +1,6 @@
 {
   "name": "tdp-countdown-bot",
-  "version": "5.6.0",
+  "version": "6.0.0_beta",
   "description": "",
   "main": "index.js",
   "scripts": {
