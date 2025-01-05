@@ -69,7 +69,7 @@ typings/
 .yarn-integrity
 
 # dotenv environment variables file
-.env
+*.env
 .env.test
 
 # parcel-bundler cache (https://parceljs.org/)
@@ -104,8 +104,9 @@ dist
 .tern-port
 
 #pictures
-.png
-.jpeg
+*.png
+*.jpeg
+*.jpg
+
+#other
 package-lock.json
-src/config/credentials.env
-src/temp/

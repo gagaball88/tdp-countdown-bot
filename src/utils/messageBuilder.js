@@ -3,16 +3,16 @@ import humanize from "humanize-duration";
 
 
 export default function messageBuilder(countdownHour, countdownDay, countdownMonth, countdownYear, mode, accuracy, dayCount, message1, message2, messageEnd, over) {
-    
+
     let start;
     let end;
 
-    
-    if(mode === 'countdown') {
+
+    if (mode === 'countdown') {
         start = DateTime.local();
         end = DateTime.local(countdownYear, countdownMonth, countdownDay, countdownHour, 0, 0);
     }
-    if(mode === 'countup') {
+    if (mode === 'countup') {
         start = DateTime.local(countdownYear, countdownMonth, countdownDay, countdownHour, 0, 0);
         end = DateTime.local();
     }
@@ -22,7 +22,7 @@ export default function messageBuilder(countdownHour, countdownDay, countdownMon
 
     let status = "";
 
-    
+
     if (!over) {
         status += message1 + " ";
 
@@ -33,10 +33,10 @@ export default function messageBuilder(countdownHour, countdownDay, countdownMon
                 units: ["y"],
                 round: true,
                 conjunction: " and ",
-                })
-                if (dayCount) status += ' (or ' + fullDays + ' days)';
+            })
+            if (dayCount) status += ' (or ' + fullDays + ' days)';
         }
-        
+
         if (accuracy === 1) {
             status += humanize(fullMS, {
                 language: "en",
@@ -44,8 +44,8 @@ export default function messageBuilder(countdownHour, countdownDay, countdownMon
                 units: ["y", "mo"],
                 round: true,
                 conjunction: " and ",
-                })
-                if (dayCount) status += ' (or ' + fullDays + ' days)';
+            })
+            if (dayCount) status += ' (or ' + fullDays + ' days)';
         }
 
         if (accuracy === 2) {
@@ -55,8 +55,8 @@ export default function messageBuilder(countdownHour, countdownDay, countdownMon
                 units: ["y", "mo", "d"],
                 round: true,
                 conjunction: " and ",
-                })
-                if (dayCount) status += ' (or ' + fullDays + ' days)';
+            })
+            if (dayCount) status += ' (or ' + fullDays + ' days)';
         }
 
         if (accuracy === 3) {
@@ -66,8 +66,8 @@ export default function messageBuilder(countdownHour, countdownDay, countdownMon
                 units: ["y", "mo", "d", "h"],
                 round: true,
                 conjunction: " and ",
-                })
-                if (dayCount) status += ' (or ' + fullDays + ' days)';
+            })
+            if (dayCount) status += ' (or ' + fullDays + ' days)';
         }
 
         if (accuracy === 4) {
@@ -77,19 +77,19 @@ export default function messageBuilder(countdownHour, countdownDay, countdownMon
                 units: ["y", "mo", "d", "h", "m"],
                 round: true,
                 conjunction: " and ",
-                })
-                if (dayCount) status += ' (or ' + fullDays + ' days)';
+            })
+            if (dayCount) status += ' (or ' + fullDays + ' days)';
         }
 
         if (accuracy === 5) {
-            if(fullDays >= 365) {
+            if (fullDays >= 365) {
                 status += humanize(fullMS, {
                     language: "en",
                     serialComma: false,
                     units: ["y", "mo", "d"],
                     round: true,
                     conjunction: " and ",
-                    })
+                })
 
             }
             if (fullDays < 365 && fullDays >= 30) {
@@ -99,7 +99,7 @@ export default function messageBuilder(countdownHour, countdownDay, countdownMon
                     units: ["mo", "d"],
                     round: true,
                     conjunction: " and ",
-                    })
+                })
             }
             if (fullDays < 30 && fullDays > 0) {
                 status += humanize(fullMS, {
@@ -108,7 +108,7 @@ export default function messageBuilder(countdownHour, countdownDay, countdownMon
                     units: ["d", "h"],
                     round: true,
                     conjunction: " and ",
-                    })
+                })
             }
             if (fullDays < 1) {
                 status += humanize(fullMS, {
@@ -117,14 +117,14 @@ export default function messageBuilder(countdownHour, countdownDay, countdownMon
                     units: ["h", "m"],
                     round: true,
                     conjunction: " and ",
-                    })
+                })
             }
             if (fullDays > 30) status += ' (or ' + fullDays + ' days)';
-            
+
         }
 
 
-        status += message2;
+        status += " " + message2;
 
     } else {
         status += messageEnd;

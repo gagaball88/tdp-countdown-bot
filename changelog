@@ -1,19 +1,34 @@
+# Changelog
+
+6.0.0
+
+- removed Threads support
+- changed picture handling from files to postgres database
+- updated dependencies
+- updated readme to reflect changes
+- cleaned up code
+
 5.6.0
+
 - added Threads implementation
 
 5.5.2
+
 - fixed a bug where at exactly one year there wouldn't be a time in the message
 
 5.5.1
+
 - minor bugfixes
 
 5.5.0
+
 - fixed Bluesky, Tumblr, Mastodon post
 
 5.4.1
+
 - fixed text generation bug
 
-
 5.4.0
+
 - added Bluesky functionality
 - updated dependencies

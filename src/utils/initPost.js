@@ -1,25 +1,26 @@
-import { sendTweet } from"./sendPost.js";
+import { sendTweet } from "./sendPost.js";
 import { sendBluesky } from "./sendPost.js";
-import { sendMastodon } from"./sendPost.js";
-import { sendTumblr } from"./sendPost.js";
-import { sendDiscord } from"./sendPost.js";
-//import { sendThreads } from"./sendPost.js";
-import messageBuilder from"./messageBuilder.js";
+import { sendMastodon } from "./sendPost.js";
+import { sendTumblr } from "./sendPost.js";
+import { sendDiscord } from "./sendPost.js";
+import messageBuilder from "./messageBuilder.js";
 import refreshPic from "./refreshPic.js";
 import player from "play-sound";
 import logger from "./logger.js";
 import { createRequire } from "module";
+import path from 'path'
 const require = createRequire(import.meta.url);
 let config = require("../config/config.json");
 
 export default async function initPost(countdownHour, countdownDay, countdownMonth, countdownYear, message1, message2, messageEnd, pictureEnd, mode, accuracy, dayCount, pictureSlot, over) {
 
+    let pictureEndDir = './pictures/endings';
+
     let picture = refreshPic(pictureSlot);
 
-    if (mode === 'countdown' && over) picture = pictureEnd;
+    if (mode === 'countdown' && over) picture = path.join(pictureEndDir, pictureEnd);
 
     let message = messageBuilder(countdownHour, countdownDay, countdownMonth, countdownYear, mode, accuracy, dayCount, message1, message2, messageEnd, over);
-    //console.log(picture);
 
     let debuggingEnv = config.debuggingEnv
 
@@ -29,22 +30,18 @@ export default async function initPost(countdownHour, countdownDay, countdownMon
 
         try {
             await sendTweet(message, picture);
-            //logger("Message: " + message + "\n\nPicture : " + picture + "\n")
             player().play('./sounds/notify.mp3');
 
-            //throw 'MyException';
         }
-        catch(e) {
+        catch (e) {
             logger('!!!WARNING!!!\n\nTweet not sent!\n\nPicture used:' + picture + '\n\nError log:')
             console.log(e);
         }
 
-        try {
+        /*try {
             await sendBluesky(message, picture);
-            //logger("Message: " + message + "\n\nPicture : " + picture + "\n")
             player().play('./sounds/notify.mp3');
 
-            //throw 'MyException';
         }
         catch(e) {
             logger('!!!WARNING!!!\n\nBluesky Post not sent!\n\nPicture used:' + picture + '\n\nError log:')
@@ -53,10 +50,8 @@ export default async function initPost(countdownHour, countdownDay, countdownMon
 
         try {
             await sendMastodon(message, picture);
-            //logger("Message: " + message + "\n\nPicture : " + picture + "\n")
             player().play('./sounds/notify.mp3');
 
-            //throw 'MyException';
         }
         catch(e) {
             logger('!!!WARNING!!!\n\nMastodon message not sent!\n\nPicture used:' + picture + '\n\nError log:')
@@ -65,10 +60,8 @@ export default async function initPost(countdownHour, countdownDay, countdownMon
 
         try {
             await sendTumblr(message, picture);
-            //logger("Message: " + message + "\n\nPicture : " + picture + "\n")
             player().play('./sounds/notify.mp3');
 
-            //throw 'MyException';
         }
         catch(e) {
             logger('!!!WARNING!!!\n\nTumblr message not sent!\n\nPicture used:' + picture + '\n\nError log:')
@@ -78,27 +71,15 @@ export default async function initPost(countdownHour, countdownDay, countdownMon
 
         try {
             await sendDiscord(message, picture);
-            //logger("Message: " + message + "\n\nPicture : " + picture + "\n")
             player().play('./sounds/notify.mp3');
 
-            //throw 'MyException';
         }
         catch(e) {
             logger('!!!WARNING!!!\n\nDiscord message not sent!\n\nPicture used:' + picture + '\n\nError log:')
             console.log(e);
-        }
-
-        /*try {
-            await sendThreads(message, picture);
-            //logger("Message: " + message + "\n\nPicture : " + picture + "\n")
-            player().play('./sounds/notify.mp3');
-
-            //throw 'MyException';
-        }
-        catch(e) {
-            logger('!!!WARNING!!!\n\nThreads message not sent!\n\nPicture used:' + picture + '\n\nError log:')
-            console.log(e);
         }*/
+
     }
     else logger("Program in debug mode. Message: " + message + " " + picture);
+    player().play('./sounds/notify.mp3');
 }

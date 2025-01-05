@@ -1,6 +1,6 @@
 {
   "name": "tdp-countdown-bot",
-  "version": "6.0.0_beta",
+  "version": "6.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -8,7 +8,7 @@
   },
   "type": "module",
   "author": "gagaball88",
-  "license": "",
+  "license": "Apache-2.0",
   "dependencies": {
     "dotenv": "16.4.7",
     "esc-exit": "3.0.1",
@@ -22,7 +22,6 @@
     "masto": "6.10.1",
     "discord.js": "14.17.2",
     "@atproto/api": "0.13.25",
-    "threads-api": "1.6.3",
-    "pg":"8.13.1"
+    "pg": "8.13.1"
   }
 }
