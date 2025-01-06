@@ -1,6 +1,7 @@
 import fs from 'fs'
 import path from 'path'
 import pg from 'pg';
+import logger from './logger.js';
 const { Client } = pg;
 import { pgConfig } from "../config/credentials.js";
 

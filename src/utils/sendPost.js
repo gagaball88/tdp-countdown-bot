@@ -1,6 +1,7 @@
 import { tumblrConfig, twitterConfig, mastodonConfig, discordConfig, blueskyConfig, threadsConfig } from "../config/credentials.js";
 import { createRestAPIClient } from 'masto';
 import fs from 'fs';
+import logger from './logger.js';
 import tumblr from 'tumblr.js';
 import { TwitterApi } from "twitter-api-v2";
 import { AtpAgent } from '@atproto/api'
