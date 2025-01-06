@@ -27,7 +27,7 @@ async function extractImage(categories) {
 
     //Generate a random index based on the total count
     const randomIndex = Math.floor(Math.random() * totalCount);
-    console.log("Total count: " + totalCount + ", Index: " + randomIndex);
+    //logger("Total count: " + totalCount + ", Index: " + randomIndex);
 
     //Fetch the random picture based on the random index
     const pictureQuery = `
@@ -52,9 +52,9 @@ async function extractImage(categories) {
     const filePath = path.join(outputDir, `temp_img.jpg`);
     fs.writeFileSync(filePath, picture.picture_data);
 
-    console.log(`Image with ID ${picture.id} saved to ${filePath}`);
+    logger(`Image with ID ${picture.id} saved to ${filePath}`);
   } catch (error) {
-    console.error('Failed to extract the image:', error);
+    logger.error('Failed to extract the image:', error);
   } finally {
     await client.end();
   }

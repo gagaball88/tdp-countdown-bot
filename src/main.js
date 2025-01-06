@@ -1,12 +1,16 @@
 import logger from './utils/logger.js';
 import taskPlanner from './utils/taskPlanner.js';
+import { startServer } from './utils/webUI.js';
 import escExit from 'esc-exit';
 import player from 'play-sound';
-
+import { createConfigIfNeeded } from './config/config.js';
 import { createRequire } from "module";
 const require = createRequire(import.meta.url);
 
+createConfigIfNeeded('./config/config.json');
+
 let config = require("./config/config.json");
+logger("Config file loaded");
 
 let slotHour, slotDay, slotMonth, slotYear, message1Slot, message2Slot, messageEndSlot, pictureEndSlot, activeSlot, modeSlot, accuracySlot, dayCountSlot, pictureSlot, postTimeSlot
 
@@ -69,6 +73,7 @@ function updateVariables() {
 console.log("To quit, press ESC or Ctrl-C\n\n");
 logger("Bot started successfully\n");
 player().play('./sounds/start.mp3');
+startServer();
 
 
 escExit();

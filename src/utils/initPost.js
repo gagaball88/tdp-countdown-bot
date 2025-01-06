@@ -10,7 +10,7 @@ import logger from "./logger.js";
 import { createRequire } from "module";
 import path from 'path'
 const require = createRequire(import.meta.url);
-let config = require("../config/config.json");
+let config = null
 
 export default async function initPost(countdownHour, countdownDay, countdownMonth, countdownYear, message1, message2, messageEnd, pictureEnd, mode, accuracy, dayCount, pictureSlot, over) {
 
@@ -22,11 +22,14 @@ export default async function initPost(countdownHour, countdownDay, countdownMon
 
     let message = messageBuilder(countdownHour, countdownDay, countdownMonth, countdownYear, mode, accuracy, dayCount, message1, message2, messageEnd, over);
 
+    config = require("../config/config.json");
+
     let debuggingEnv = config.debuggingEnv
 
     if (!debuggingEnv) {
-
-        logger('Sending message: ' + message + '\nPicture: ' + picture + '\n..........')
+        
+        if (!over) {logger('Sending message: ' + message);}
+        else {logger('Sending message: ' + message + '\nPicture: ' + picture + '\n..........');}
 
         try {
             await sendTweet(message, picture);
@@ -35,17 +38,17 @@ export default async function initPost(countdownHour, countdownDay, countdownMon
         }
         catch (e) {
             logger('!!!WARNING!!!\n\nTweet not sent!\n\nPicture used:' + picture + '\n\nError log:')
-            console.log(e);
+            logger(e);
         }
 
-        /*try {
+        try {
             await sendBluesky(message, picture);
             player().play('./sounds/notify.mp3');
 
         }
         catch(e) {
             logger('!!!WARNING!!!\n\nBluesky Post not sent!\n\nPicture used:' + picture + '\n\nError log:')
-            console.log(e);
+            logger(e);
         }
 
         try {
@@ -55,7 +58,7 @@ export default async function initPost(countdownHour, countdownDay, countdownMon
         }
         catch(e) {
             logger('!!!WARNING!!!\n\nMastodon message not sent!\n\nPicture used:' + picture + '\n\nError log:')
-            console.log(e);
+            logger(e);
         }
 
         try {
@@ -65,7 +68,7 @@ export default async function initPost(countdownHour, countdownDay, countdownMon
         }
         catch(e) {
             logger('!!!WARNING!!!\n\nTumblr message not sent!\n\nPicture used:' + picture + '\n\nError log:')
-            console.log(e);
+            logger(e);
         }
         
 
@@ -76,8 +79,8 @@ export default async function initPost(countdownHour, countdownDay, countdownMon
         }
         catch(e) {
             logger('!!!WARNING!!!\n\nDiscord message not sent!\n\nPicture used:' + picture + '\n\nError log:')
-            console.log(e);
-        }*/
+            logger(e);
+        }
 
     }
     else logger("Program in debug mode. Message: " + message + " " + picture);

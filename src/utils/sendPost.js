@@ -15,7 +15,7 @@ const blueskyClient = new AtpAgent({
   service: 'https://bsky.social'
 });
 try { await blueskyClient.login(blueskyConfig) }
-catch (e) { console.log(e) }
+catch (e) { logger(e) }
 
 const mastodonClient = createRestAPIClient(mastodonConfig);
 
@@ -32,7 +32,7 @@ export async function sendTweet(message, imagePath) {
   ]);
 
   await twitterClient.v2.tweet({ text: message, media: { media_ids: mediaId } });
-  console.log("Tweet sent");
+  logger("Tweet sent");
 
 }
 
@@ -61,7 +61,7 @@ export async function sendBluesky(message, imagePath) {
     },
   });
 
-  console.log("Bluesky post sent");
+  logger("Bluesky post sent");
 }
 
 export async function sendMastodon(message, imagePath) {
@@ -77,7 +77,7 @@ export async function sendMastodon(message, imagePath) {
     mediaIds: [attachment1.id],
   });
 
-  console.log("Mastodon post sent");
+  logger("Mastodon post sent");
 
 }
 
@@ -103,7 +103,7 @@ export async function sendTumblr(message, imagePath) {
     tags: [tags]
   });
 
-  console.log("Tumblr post sent");
+  logger("Tumblr post sent");
 
 }
 
@@ -120,7 +120,7 @@ export async function sendDiscord(message, imagePath) {
     const channel = guild.channels.cache.find(channel => channel.name === 'tdp-countdown-bot')
 
     let serverName = guild.name;
-    console.log("...sending on Server: " + serverName)
+    logger("...sending on Server: " + serverName)
 
     try {
       await channel.send({
@@ -134,11 +134,11 @@ export async function sendDiscord(message, imagePath) {
     }
 
     catch (e) {
-      console.log(e);
+      logger(e);
     }
 
   })
 
-  console.log("Discord messages sent");
+  logger("Discord messages sent");
 
 }
