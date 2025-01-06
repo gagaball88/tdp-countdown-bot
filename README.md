@@ -6,7 +6,7 @@ Bot that counts down to/up from a specified date with custom text/images
 
 Steps to set up this bot:
 
-1. Download the latest [release](https://github.com/gagaball88/tdp-countdown-bot/releases/tag/Releases/latest) and extract it to a folder of your choice.
+1. Download the latest [release](https://github.com/gagaball88/tdp-countdown-bot/releases/latest) and extract it to a folder of your choice.
 2. Replace the contents of `src/config/config.json` with your own countdowns.
 3. Add your Platform API Keys for Twitter, Mastodon, Tumblr and Discord to `src/config/credentials.env.test` and rename the file to `credentials.env`.
 4. Create a new table called `pictures` in a postgres database.
