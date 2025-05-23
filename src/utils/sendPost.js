@@ -1,8 +1,9 @@
-import { tumblrConfig, twitterConfig, mastodonConfig, discordConfig, blueskyConfig, threadsConfig } from "../config/credentials.js";
+import { tumblrConfig, twitterConfig, mastodonConfig, discordConfig, blueskyConfig } from "../config/credentials.js";
 import { createRestAPIClient } from 'masto';
 import fs from 'fs';
 import logger from './logger.js';
 import tumblr from 'tumblr.js';
+import mime from 'mime-types';
 import { TwitterApi } from "twitter-api-v2";
 import { AtpAgent } from '@atproto/api'
 import discordImport, { GatewayIntentBits } from 'discord.js';
@@ -40,15 +41,15 @@ export async function sendTweet(message, imagePath) {
 export async function sendBluesky(message, imagePath) {
 
   const byteArray = fs.readFileSync(imagePath);
+  const mimeType = mime.lookup(imagePath);
 
-  let format = imagePath.substr(imagePath.length - 3);
-  let picUpload
-  if (format === "png") {
-    picUpload = await blueskyClient.uploadBlob(byteArray, { encoding: "image/png" });
+  if (!mimeType || !['image/png', 'image/jpeg', 'image/jpg'].includes(mimeType.toLowerCase())) {
+    logger.error(`Unsupported image type for Bluesky: ${mimeType || 'unknown'} from path ${imagePath}. Skipping Bluesky post.`);
+    return; // Stop further execution for this post
   }
-  else if (format === "jpg" || format === "peg") {
-    picUpload = await blueskyClient.uploadBlob(byteArray, { encoding: "image/jpg" });
-  }
+
+  const picUpload = await blueskyClient.uploadBlob(byteArray, { encoding: mimeType });
+
   await blueskyClient.post({
     text: message,
     embed: {
@@ -82,12 +83,10 @@ export async function sendMastodon(message, imagePath) {
 
 }
 
-export async function sendTumblr(message, imagePath) {
+export async function sendTumblr(message, imagePath, blogName) {
 
   let file = fs.createReadStream(imagePath)
   let tags = "the dragon prince, TDP Countdown"
-
-  let blogName = "countdowntdp"
 
   await tumblrClient.createPost(blogName, {
     content: [
@@ -109,16 +108,16 @@ export async function sendTumblr(message, imagePath) {
 }
 
 
-export async function sendDiscord(message, imagePath) {
+export async function sendDiscord(message, imagePath, channelName) {
 
   const lastIndex = imagePath.lastIndexOf('/');
 
   const image = String(imagePath).substring(lastIndex + 1);
 
-  const attachment = new AttachmentBuilder(path, { name: image })
+  const attachment = new AttachmentBuilder(imagePath, { name: image })
 
   discordClient.guilds.cache.forEach(async (guild) => {
-    const channel = guild.channels.cache.find(channel => channel.name === 'tdp-countdown-bot')
+    const channel = guild.channels.cache.find(ch => ch.name === channelName)
 
     let serverName = guild.name;
     logger("...sending on Server: " + serverName)

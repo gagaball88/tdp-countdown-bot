@@ -10,9 +10,9 @@ import logger from "./logger.js";
 import { createRequire } from "module";
 import path from 'path'
 const require = createRequire(import.meta.url);
-let config = null
 
-export default async function initPost(countdownHour, countdownDay, countdownMonth, countdownYear, message1, message2, messageEnd, pictureEnd, mode, accuracy, dayCount, pictureSlot, over) {
+export default async function initPost(postDetails) {
+    const { hour, day, month, year, mode, accuracy, dayCount, message1, message2, messageEnd, pictureEnd, pictureSlot, over, debuggingEnv, tumblrBlogName, discordChannelName } = postDetails;
 
     let pictureEndDir = './pictures/endings';
 
@@ -20,11 +20,7 @@ export default async function initPost(countdownHour, countdownDay, countdownMon
 
     if (mode === 'countdown' && over) picture = path.join(pictureEndDir, pictureEnd);
 
-    let message = messageBuilder(countdownHour, countdownDay, countdownMonth, countdownYear, mode, accuracy, dayCount, message1, message2, messageEnd, over);
-
-    config = require("../config/config.json");
-
-    let debuggingEnv = config.debuggingEnv
+    let message = messageBuilder(hour, day, month, year, mode, accuracy, dayCount, message1, message2, messageEnd, over);
 
     if (!debuggingEnv) {
         
@@ -33,8 +29,11 @@ export default async function initPost(countdownHour, countdownDay, countdownMon
 
         try {
             await sendTweet(message, picture);
-            player().play('./sounds/notify.mp3');
-
+            try {
+                player().play('./sounds/notify.mp3');
+            } catch (soundError) {
+                logger.error("Failed to play notification sound after Tweet './sounds/notify.mp3'", soundError);
+            }
         }
         catch (e) {
             logger('!!!WARNING!!!\n\nTweet not sent!\n\nPicture used:' + picture + '\n\nError log:')
@@ -43,8 +42,11 @@ export default async function initPost(countdownHour, countdownDay, countdownMon
 
         try {
             await sendBluesky(message, picture);
-            player().play('./sounds/notify.mp3');
-
+            try {
+                player().play('./sounds/notify.mp3');
+            } catch (soundError) {
+                logger.error("Failed to play notification sound after Bluesky post './sounds/notify.mp3'", soundError);
+            }
         }
         catch(e) {
             logger('!!!WARNING!!!\n\nBluesky Post not sent!\n\nPicture used:' + picture + '\n\nError log:')
@@ -53,8 +55,11 @@ export default async function initPost(countdownHour, countdownDay, countdownMon
 
         try {
             await sendMastodon(message, picture);
-            player().play('./sounds/notify.mp3');
-
+            try {
+                player().play('./sounds/notify.mp3');
+            } catch (soundError) {
+                logger.error("Failed to play notification sound after Mastodon post './sounds/notify.mp3'", soundError);
+            }
         }
         catch(e) {
             logger('!!!WARNING!!!\n\nMastodon message not sent!\n\nPicture used:' + picture + '\n\nError log:')
@@ -62,9 +67,12 @@ export default async function initPost(countdownHour, countdownDay, countdownMon
         }
 
         try {
-            await sendTumblr(message, picture);
-            player().play('./sounds/notify.mp3');
-
+            await sendTumblr(message, picture, tumblrBlogName);
+            try {
+                player().play('./sounds/notify.mp3');
+            } catch (soundError) {
+                logger.error("Failed to play notification sound after Tumblr post './sounds/notify.mp3'", soundError);
+            }
         }
         catch(e) {
             logger('!!!WARNING!!!\n\nTumblr message not sent!\n\nPicture used:' + picture + '\n\nError log:')
@@ -73,9 +81,12 @@ export default async function initPost(countdownHour, countdownDay, countdownMon
         
 
         try {
-            await sendDiscord(message, picture);
-            player().play('./sounds/notify.mp3');
-
+            await sendDiscord(message, picture, discordChannelName);
+            try {
+                player().play('./sounds/notify.mp3');
+            } catch (soundError) {
+                logger.error("Failed to play notification sound after Discord post './sounds/notify.mp3'", soundError);
+            }
         }
         catch(e) {
             logger('!!!WARNING!!!\n\nDiscord message not sent!\n\nPicture used:' + picture + '\n\nError log:')
@@ -84,5 +95,9 @@ export default async function initPost(countdownHour, countdownDay, countdownMon
 
     }
     else logger("Program in debug mode. Message: " + message + " " + picture);
-    player().play('./sounds/notify.mp3');
+    try {
+        player().play('./sounds/notify.mp3');
+    } catch (e) {
+        logger.error("Failed to play final notification sound './sounds/notify.mp3'", e);
+    }
 }

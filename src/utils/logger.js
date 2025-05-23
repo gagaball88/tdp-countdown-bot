@@ -1,4 +1,4 @@
-import { refreshData } from './webUI.js';
+import { refreshData as refreshWebUIData } from './webUI.js';
 
 export default function logger(message) {
 
@@ -6,8 +6,13 @@ export default function logger(message) {
     const d = new Date();
 
     let timestamp = `${pad(d.getFullYear(), 4)}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+    const logString = `${timestamp} - ${message}`;
 
-    console.log("\r" + timestamp + " - " + message + "\n");
-    refreshData(timestamp + " - " + message);
+    console.log("\r" + logString + "\n");
+    try {
+        refreshWebUIData(logString);
+    } catch (webUiError) {
+        console.error("Error refreshing Web UI data:", webUiError);
+    }
 
 }

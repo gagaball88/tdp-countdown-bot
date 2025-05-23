@@ -3,6 +3,8 @@ import logger from '../utils/logger.js';
 
 const defaultConfig = {
     debuggingEnv: true,
+    tumblrBlogName: "countdowntdp",
+    discordChannelName: "tdp-countdown-bot",
     slots: [
         {
             hour: 9,
