@@ -16,9 +16,32 @@ export default async function initPost(postDetails) {
 
     let pictureEndDir = './pictures/endings';
 
-    let picture = refreshPic(pictureSlot);
+    let picture = null; // Initialize picture to null
 
-    if (mode === 'countdown' && over) picture = path.join(pictureEndDir, pictureEnd);
+    try {
+        // Only attempt to refresh picture if pictureSlot is provided and is a non-empty string
+        if (pictureSlot && typeof pictureSlot === 'string' && pictureSlot.trim() !== '') {
+            picture = await refreshPic(pictureSlot);
+        } else {
+            // logger(`[initPost] No pictureSlot defined or is empty. Proceeding without picture refresh.`, 'DEBUG');
+            picture = null;
+        }
+    } catch (error) {
+        logger(`[initPost] Failed to refresh picture using slot '${pictureSlot}'. Error: ${String(error)}`, 'ERROR');
+        picture = null; // Ensure picture is null if refreshPic fails
+    }
+
+    if (mode === 'countdown' && over) {
+        if (pictureEnd && typeof pictureEnd === 'string' && pictureEnd.trim() !== '') {
+            picture = path.join(pictureEndDir, pictureEnd);
+        } else {
+            // If pictureEnd is also not available, picture remains null (or its state from the try-catch, which should be null on failure)
+            logger(`[initPost] Countdown over, but no pictureEnd defined or is empty. Picture will remain as is (likely null).`, 'WARN');
+            if (picture === undefined) { // Should not happen if initialized to null, but as a safeguard
+                picture = null;
+            }
+        }
+    }
 
     let message = messageBuilder(hour, day, month, year, mode, accuracy, dayCount, message1, message2, messageEnd, over);
 
