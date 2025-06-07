@@ -3,6 +3,7 @@ import express from 'express';
 import bodyParser from 'body-parser';
 import fs from 'fs';
 import path from 'path'; // Added path import
+import { fileURLToPath } from 'url'; // Added for ES module __dirname equivalent
 
 // escapeHtml can be removed if not used anywhere else on server-side
 // function escapeHtml(unsafe) { ... } 
@@ -13,7 +14,9 @@ var clients = [];
 
 const app = express();
 const PORT = 8080;
-const configPath = './config/config.json'; // Define configPath once
+const __filename = fileURLToPath(import.meta.url); // ES module __filename
+const __dirname = path.dirname(__filename); // ES module __dirname
+const configPath = path.resolve(__dirname, '../config/config.json'); // Define configPath once
 
 export async function startServer() {
     // Serve static files from web_public first
@@ -65,6 +68,7 @@ export async function startServer() {
     // and don't rely on a potentially stale 'config' variable from startServer scope.
 
     app.post("/saveSlot/:index", (req, res) => {
+        logger(`Received body for saveSlot: ${JSON.stringify(req.body)}`, 'DEBUG'); // New logging line
         const index = parseInt(req.params.index, 10);
         let currentConfig;
         try {
@@ -100,8 +104,10 @@ export async function startServer() {
         const postTimeValue = parseInt(rawPostTime, 10); // Renamed to avoid conflict
         if (isNaN(postTimeValue) || postTimeValue < 0 || postTimeValue > 23) errors.postTime = "Post Time must be a number between 0 and 23.";
 
-        if (typeof message1 !== 'string' || message1.trim() === "") errors.message1 = "Message 1 is required.";
-        if (typeof message2 !== 'string' || message2.trim() === "") errors.message2 = "Message 2 is required.";
+        if (typeof message1 !== 'string') errors.message1 = "Message 1 must be a string.";
+        // Allow message1 to be empty
+        if (typeof message2 !== 'string') errors.message2 = "Message 2 must be a string.";
+        // Allow message2 to be empty
         if (typeof mode !== 'string' || !['countdown', 'countup'].includes(mode.toLowerCase())) errors.mode = "Mode must be 'countdown' or 'countup'.";
 
         const active = String(rawActive).toLowerCase() === "true" || rawActive === true;
