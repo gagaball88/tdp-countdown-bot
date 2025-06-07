@@ -4,10 +4,12 @@ import logger from '../utils/logger.js'; // This import might be problematic due
 const configPath = './config.json'; // Define a path for the config file
 
 const defaultConfig = {
-    LOG_LEVEL: 'INFO', // Added LOG_LEVEL
-    debuggingEnv: true,
-    tumblrBlogName: "countdowntdp",
-    discordChannelName: "tdp-countdown-bot",
+    settings: {
+        logLevel: "INFO", 
+        debuggingEnv: true,
+        tumblrBlogName: "countdowntdp",
+        discordChannelName: "tdp-countdown-bot"
+    },
     slots: [
         {
             hour: 9,

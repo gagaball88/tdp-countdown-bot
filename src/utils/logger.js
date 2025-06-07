@@ -1,15 +1,15 @@
 import { refreshData as refreshWebUIData } from './webUI.js';
 import config from '../config/config.js'; // Import config
 
-const LOG_LEVELS = ['DEBUG', 'INFO', 'WARN', 'ERROR']; // Updated LOG_LEVELS array
+const LOG_LEVELS = ['DEBUG', 'INFO', 'WARN', 'ERROR'];
 const LOG_LEVELS_HIERARCHY = {'DEBUG': 0, 'INFO': 1, 'WARN': 2, 'ERROR': 3};
 
 // Determine current log level from config or default to INFO
 let currentLogLevel = 'INFO';
-if (config && config.LOG_LEVEL && LOG_LEVELS_HIERARCHY.hasOwnProperty(config.LOG_LEVEL.toUpperCase())) {
+if (config && config.LOG_LEVEL && LOG_LEVELS_HIERARCHY.hasOwnProperty(config.settings.logLevel.toUpperCase())) {
     currentLogLevel = config.LOG_LEVEL.toUpperCase();
-} else if (config && config.LOG_LEVEL) {
-    console.log(`Invalid LOG_LEVEL: ${config.LOG_LEVEL}. Defaulting to INFO.`);
+} else if (config && config.settings.logLevel) {
+    console.log(`Invalid logLevel: ${config.settings.logLevel}. Defaulting to INFO.`);
 }
 
 const currentLogLevelNumeric = LOG_LEVELS_HIERARCHY[currentLogLevel];

@@ -60,7 +60,6 @@ document.addEventListener('DOMContentLoaded', () => {
             renderSlots();
             allLogs = data.initialMessages || []; // Store initial logs
             renderFilteredLogs(); // Render logs based on default toggle states
-            // displayLatestPicture(); // Called at the end of DOMContentLoaded instead
         })
         .catch(error => console.error('Error fetching initial data:', error));
 
@@ -135,8 +134,6 @@ document.addEventListener('DOMContentLoaded', () => {
         logsContainer.scrollTop = logsContainer.scrollHeight; // Scroll to bottom
     }
 
-    // This function now only appends a single log if it passes the filter
-    // It's mainly called by the SSE handler for new incoming logs.
     function appendLog(message) {
         const level = parseLogLevel(message);
         if (logLevelToggles[level] && logLevelToggles[level].checked) {
@@ -200,7 +197,6 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             console.error("#slot-index input field not found!");
             // If this happens, the form can't be saved correctly.
-            // Potentially alert the user or disable save button.
         }
 
         // Populate the rest of the form...
@@ -212,8 +208,8 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('slot-postTime').value = slot.postTime !== undefined ? slot.postTime : 0;
         document.getElementById('slot-active').checked = slot.active !== undefined ? slot.active : true;
         document.getElementById('slot-dayCount').checked = slot.dayCount !== undefined ? slot.dayCount : true;
-        document.getElementById('slot-message1').value = slot.message1 || 'New Message 1';
-        document.getElementById('slot-message2').value = slot.message2 || 'New Message 2';
+        document.getElementById('slot-message1').value = slot.message1 || '';
+        document.getElementById('slot-message2').value = slot.message2 || '';
         document.getElementById('slot-mode').value = slot.mode || 'countdown';
         document.getElementById('slot-messageEnd').value = slot.messageEnd || '';
         document.getElementById('slot-pictureEnd').value = slot.pictureEnd || '';
@@ -255,8 +251,6 @@ document.addEventListener('DOMContentLoaded', () => {
             .then(data_from_initialData => {
                 currentSlots = data_from_initialData.slots || [];
                 renderSlots(); // Re-render the main slots display
-                // alert("New slot added. You can now edit it."); // Consider if alert is needed or if modal opening is enough
-
                 // Now open the modal for the newly added slot, using the stored index
                 if (originalAddSlotData && originalAddSlotData.index !== undefined) {
                     console.log(`Calling openSlotModal with index from addSlot response: ${originalAddSlotData.index}`);
@@ -294,16 +288,10 @@ document.addEventListener('DOMContentLoaded', () => {
             pictureSlot: document.getElementById('slot-pictureSlot').value,
         };
 
-        // Basic client-side validation example
-        // if (slotData.message1.trim() === "" || slotData.message2.trim() === "") {
-        //     alert("Message 1 and Message 2 cannot be empty.");
-        //     return;
-        // } // This check is now removed
         if (isNaN(slotData.hour) || slotData.hour < 0 || slotData.hour > 23) {
             alert("Hour must be between 0 and 23.");
             return;
         }
-        // Add more validations as needed, mirroring backend if possible
 
         const url = `/saveSlot/${index}`;
         console.log(`Saving slot with index: ${index}, URL: ${url}`); // New logging line
@@ -332,13 +320,6 @@ document.addEventListener('DOMContentLoaded', () => {
         .then(data => {
             currentSlots = data.slots || [];
             renderSlots();
-            // If a pictureSlot was saved, attempt to display it.
-            // This assumes that saving a slot might change the "latest picture".
-            // if (slotData.pictureSlot) { // Removed dynamic picture display based on slot
-            //     displayLatestPicture(slotData.pictureSlot);
-            // } else {
-            // } // All calls to displayLatestPicture with arguments are removed.
-            // The new displayLatestPicture() will be called on load and potentially by an interval.
         })
         .catch(error => {
             console.error('Error saving slot:', error);
@@ -371,16 +352,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 alert(`Error deleting slot: ${error.message}`);
             });
     }
-
-    // Initial call to display a picture if one is available (e.g. from a default slot)
-    // This needs a defined logic, e.g., finding the first active slot with a picture.
-    // For now, it will show "No picture available yet." by default.
-    // displayLatestPicture(findInitialPicture(currentSlots)); // Removed
-
-    // Placeholder: How to determine the "latest" picture?
-    // Option 1: Backend sends it in /api/initial-data.
-    // Option 2: SSE event specifically for picture updates.
-    // Option 3: Client derives it (e.g., picture from the most recently active slot, or a designated "main" picture slot).
 
     displayLatestPicture(); // Call it on load
 
@@ -419,9 +390,8 @@ document.addEventListener('DOMContentLoaded', () => {
         console.warn('#save-settings-btn or other settings UI elements not found. Global settings cannot be saved via UI.');
     }
 
-    // Potentially set an interval if the image is expected to change dynamically
-    // and you want the UI to refresh it without a full page reload.
-    // setInterval(displayLatestPicture, 60000); // Refresh every 60 seconds, for example
+    //Interval dynamic image change
+    setInterval(displayLatestPicture, 60000); // Refresh every 60 seconds
 
     // Dark Mode Toggle Functionality
     const darkModeToggle = document.getElementById('darkModeToggle');
@@ -445,13 +415,6 @@ document.addEventListener('DOMContentLoaded', () => {
     } else {
         enableDarkMode(); // Default to dark mode
     }
-    // Apply default log toggle states (already set in HTML, but good to be explicit if needed)
-    // logLevelToggles.DEBUG.checked = false;
-    // logLevelToggles.INFO.checked = true;
-    // logLevelToggles.WARN.checked = true;
-    // logLevelToggles.ERROR.checked = true;
-    // renderFilteredLogs(); // Initial render based on defaults - already called after fetching initial data
-
 
     if (darkModeToggle) {
         darkModeToggle.addEventListener('change', () => {
@@ -463,8 +426,3 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
-
-// Example helper: function findInitialPicture(slots) { // This helper is no longer used
-//    const activeSlotWithPic = slots.find(s => s.active && s.pictureSlot);
-//    return activeSlotWithPic ? activeSlotWithPic.pictureSlot : null;
-// }

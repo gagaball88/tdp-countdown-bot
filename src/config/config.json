@@ -1,5 +1,6 @@
 {
   "settings": {
+    "logLevel": "INFO",
     "debuggingEnv": true,
     "tumblrBlogName": "",
     "discordChannelName": ""

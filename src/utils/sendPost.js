@@ -7,7 +7,6 @@ import mime from 'mime-types';
 import { TwitterApi } from "twitter-api-v2";
 import { AtpAgent } from '@atproto/api'
 import discordImport, { GatewayIntentBits } from 'discord.js';
-import path from "path";
 const { Client, AttachmentBuilder } = discordImport;
 
 

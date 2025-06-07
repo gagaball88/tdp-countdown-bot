@@ -7,11 +7,11 @@ const { Client } = pg;
 import { pgConfig } from "../config/credentials.js";
 
 const outputDir = './pictures';
-const tempImageName = 'temp_img.jpg'; // Define image name for consistency
+const tempImageName = 'temp_img.jpg';
 
 async function extractImage(categories) {
   const client = new Client(pgConfig);
-  const filePath = path.join(outputDir, tempImageName); // Define filePath early
+  const filePath = path.join(outputDir, tempImageName);
 
   try {
     // Ensure the output directory exists before any file operations
@@ -83,5 +83,5 @@ async function extractImage(categories) {
 
 export default async function refreshPic(categories) {
   await extractImage(categories);
-  return path.join(outputDir, tempImageName); // Use defined constant
+  return path.join(outputDir, tempImageName);
 }

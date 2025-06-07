@@ -88,36 +88,36 @@ This bot requires API keys and access tokens for the various platforms it intera
 4.  **Security Note:**
     The `credentials.env` file is listed in `.gitignore`, so it will not be committed to your Git repository. **Never share this file or commit it to version control.** Keep your credentials secure.
 
-### Logging Configuration (`LOG_LEVEL`)
+### Logging Configuration (`logLevel`)
 
-You can control the verbosity of the application logs by setting the `LOG_LEVEL` environment variable. This helps in debugging issues or reducing noise in production environments.
+You can control the verbosity of the application logs by setting the `logLevel` environment variable. This helps in debugging issues or reducing noise in production environments.
 
 The available log levels are, in order of increasing severity (and decreasing verbosity):
 
 1.  `DEBUG`: Shows all log messages, including detailed debugging information.
-2.  `INFO`: Shows informational messages, warnings, and errors. This is the default level if `LOG_LEVEL` is not set or is invalid.
+2.  `INFO`: Shows informational messages, warnings, and errors. This is the default level if `logLevel` is not set or is invalid.
 3.  `WARN`: Shows warnings and errors.
 4.  `ERROR`: Shows only error messages.
 
-The logging system is hierarchical. For example, if `LOG_LEVEL` is set to `INFO`, you will see logs of type `INFO`, `WARN`, and `ERROR`, but `DEBUG` logs will be hidden. If set to `ERROR`, only `ERROR` logs will be shown.
+The logging system is hierarchical. For example, if `logLevel` is set to `INFO`, you will see logs of type `INFO`, `WARN`, and `ERROR`, but `DEBUG` logs will be hidden. If set to `ERROR`, only `ERROR` logs will be shown.
 
-**How to set `LOG_LEVEL`:**
+**How to set `logLevel`:**
 
 *   **Using a `.env` file:**
-    You can add `LOG_LEVEL` to your `src/config/credentials.env` file (or a general `.env` file if you prefer to manage it separately, though `credentials.env` is already used for other environment-like settings):
+    You can add `logLevel` to your `src/config/credentials.env` file (or a general `.env` file if you prefer to manage it separately, though `credentials.env` is already used for other environment-like settings):
     ```env
     # In src/config/credentials.env
-    LOG_LEVEL=DEBUG
+    logLevel=DEBUG
     ```
 
 *   **Command Line:**
     You can set it when running the application:
     ```bash
-    LOG_LEVEL=DEBUG npm start
+    logLevel=DEBUG npm start
     ```
     Or, if running the `main.js` script directly with Node.js:
     ```bash
-    LOG_LEVEL=DEBUG node src/main.js
+    logLevel=DEBUG node src/main.js
     ```
 
 <!-- The following section will detail database setup for pictures -->

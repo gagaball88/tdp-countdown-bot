@@ -2,12 +2,9 @@ import logger from "./logger.js";
 import express from 'express';
 import bodyParser from 'body-parser';
 import fs from 'fs';
-import path from 'path'; // Added path import
-import { fileURLToPath } from 'url'; // Added for ES module __dirname equivalent
-import { rescheduleAllFromConfig } from './scheduler.js'; // Import reschedule function
-
-// escapeHtml can be removed if not used anywhere else on server-side
-// function escapeHtml(unsafe) { ... } 
+import path from 'path';
+import { fileURLToPath } from 'url';
+import { rescheduleAllFromConfig } from './scheduler.js';
 
 let recentLogs = [];
 const MAX_LOG_LINES = 200;
@@ -133,11 +130,8 @@ export async function startServer() {
     });
 
     // SLOT OPERATIONS (save, delete, add)
-    // These now load config on each request to ensure they have the latest data
-    // and don't rely on a potentially stale 'config' variable from startServer scope.
-
     app.post("/saveSlot/:index", (req, res) => {
-        logger(`Received body for saveSlot: ${JSON.stringify(req.body)}`, 'DEBUG'); // New logging line
+        logger(`Received body for saveSlot: ${JSON.stringify(req.body)}`, 'DEBUG');
         const index = parseInt(req.params.index, 10);
         let currentConfig;
         try {
@@ -273,8 +267,6 @@ export async function startServer() {
         logger(`Server running on port ${PORT}`, 'INFO');
     });
 }
-
-// refreshData remains the same as it's for SSE updates
 export async function refreshData(newData) {
     recentLogs.push(newData);
     if (recentLogs.length > MAX_LOG_LINES) {

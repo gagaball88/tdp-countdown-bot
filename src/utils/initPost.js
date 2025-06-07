@@ -7,9 +7,7 @@ import messageBuilder from "./messageBuilder.js";
 import refreshPic from "./refreshPic.js";
 import player from "play-sound";
 import logger from "./logger.js";
-import { createRequire } from "module";
 import path from 'path'
-const require = createRequire(import.meta.url);
 
 export default async function initPost(postDetails) {
     const { hour, day, month, year, mode, accuracy, dayCount, message1, message2, messageEnd, pictureEnd, pictureSlot, over, debuggingEnv, tumblrBlogName, discordChannelName } = postDetails;

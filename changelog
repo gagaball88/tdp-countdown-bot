@@ -1,5 +1,11 @@
 # Changelog
 
+7.0.0_alpha3
+- Comments cleanup
+- update dependencies
+- add logLevel into config
+- small adjustments
+
 7.0.0_alpha2
 
 **Fix:** (652ca8bf) Improved error handling to prevent crashes when pictures are not found or other unexpected errors occur.

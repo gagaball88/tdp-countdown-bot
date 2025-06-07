@@ -1,9 +1,8 @@
 import cron from 'node-cron';
 import { DateTime } from 'luxon';
 import isOver from './isOver.js';
-import initPost from './initPost.js'; // Assuming initPost is correctly refactored to take all details
+import initPost from './initPost.js';
 import logger from './logger.js';
-import player from 'play-sound'; // For notifications, if any are kept in this part
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { createRequire } from 'module';
@@ -11,19 +10,11 @@ import { createRequire } from 'module';
 const require = createRequire(import.meta.url);
 let activeJobs = [];
 
-// Helper function (moved from taskPlanner.js)
 function getMilliseconds(slotConfig) {
     const { year, month, day, hour } = slotConfig;
     let start = DateTime.now();
     let end = DateTime.local(year, month, day, hour, 0, 0); // Assumes event time is at the start of the hour
     let ms = end.diff(start, ['milliseconds']).milliseconds.valueOf();
-    // If mode is 'countup', we want the difference from the past event to now.
-    // If it's 'countdown', we want the difference from now to the future event.
-    // The current diff logic gives a negative number if 'end' is in the past.
-    // For 'countup', we need to make this positive as we're counting *from* that past point.
-    // However, for determining "time until next post" for scheduling, we always look forward for countdowns.
-    // For countups, they effectively post "every so often" once started.
-    // This function is primarily for 'countdown' scheduling logic.
     return (slotConfig.mode === 'countdown') ? ms : Math.abs(ms);
 }
 
@@ -83,7 +74,6 @@ Stack: ${errorStack}`, 'ERROR');
         }
     } else {
         logger(`[Scheduler] Slot ${slotConfig.message1} is inactive. Skipping post.`, 'INFO');
-        // player().play('./sounds/notify.mp3'); // Or handle via logger/other notification
     }
 }
 
@@ -107,9 +97,6 @@ export function scheduleSlot(slotConfig, globalConfig) {
         }
         return;
     }
-    
-    // For countup, if it's "over" (meaning the start time is past), it should be active.
-    // The cron pattern will handle periodic posting.
 
     let cronPattern = determineCronPattern(initialMs, slotConfig);
 
@@ -118,11 +105,8 @@ export function scheduleSlot(slotConfig, globalConfig) {
         return;
     }
     
-    // If countup and no specific pattern (e.g. way in future, which getMilliseconds might return large positive)
-    // default to daily or hourly based on how far 'initialMs' is (which would be time since event start)
+    // If countup
     if (slotConfig.mode === 'countup' && !cronPattern) {
-         // Default for countup if not fitting other patterns (e.g. if getMilliseconds was negative)
-         // This means the event has started. Let's assume hourly for countup as a default if not specified.
         logger(`[Scheduler] Countup slot ${slotConfig.message1} has started. Defaulting to hourly posting.`, 'INFO');
         cronPattern = `0 * * * *`; 
     }
@@ -164,7 +148,7 @@ export function scheduleSlot(slotConfig, globalConfig) {
             }
         }
     }, {
-        scheduled: false // Don't start immediately, we'll call .start()
+        scheduled: false
     });
 
     activeJobs.push(job);
@@ -197,6 +181,7 @@ export function rescheduleAllFromConfig() {
         }
 
         const globalConfig = {
+            logLevel: config.settings.logLevel || "INFO", 
             debuggingEnv: config.settings.debuggingEnv || false,
             tumblrBlogName: config.settings.tumblrBlogName || "",
             discordChannelName: config.settings.discordChannelName || ""
@@ -224,13 +209,5 @@ export function rescheduleAllFromConfig() {
 
     } catch (error) {
         logger(`[Scheduler] Error during rescheduleAllFromConfig: ${String(error)}`, 'ERROR');
-        // player().play('./sounds/error.mp3'); // Optional: Play error sound
     }
 }
-
-
-// Example of how logger.error might be used for sound, if desired, though initPost handles its own.
-// process.on('unhandledRejection', error => {
-//     logger.error('Unhandled Rejection:', error);
-//     player().play('./sounds/error.mp3'); // General error sound
-// });
