@@ -72,7 +72,14 @@ async function performPostAction(slotConfig, globalConfig, overStatus) {
                 over: overStatus
             });
         } catch (error) {
-            logger(`[Scheduler] Error during initPost execution for slot ${slotConfig.message1}: ${String(error)}`, 'ERROR');
+            try {
+                const errorMessage = error instanceof Error ? error.message : String(error);
+                const errorStack = error instanceof Error ? error.stack : 'No stack available.';
+                logger(`[Scheduler] Error during initPost execution for slot ${slotConfig.message1}. Error: ${errorMessage}
+Stack: ${errorStack}`, 'ERROR');
+            } catch (loggingError) {
+                console.error(`[Scheduler] CRITICAL: Failed to log error for slot ${slotConfig.message1}. Original error: ${String(error)}. Logging error: ${String(loggingError)}`);
+            }
         }
     } else {
         logger(`[Scheduler] Slot ${slotConfig.message1} is inactive. Skipping post.`, 'INFO');
