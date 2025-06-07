@@ -1,38 +1,38 @@
 import logger from './utils/logger.js';
 // import taskPlanner from './utils/taskPlanner.js'; // taskPlanner is now deprecated
-import { scheduleSlot, cancelAllJobs } from './utils/scheduler.js';
+import { rescheduleAllFromConfig } from './utils/scheduler.js'; // Changed import
 import { startServer } from './utils/webUI.js';
 import escExit from 'esc-exit';
 import player from 'play-sound';
 import { createConfigIfNeeded } from './config/config.js';
 import { createRequire } from "module";
-const require = createRequire(import.meta.url);
+const require = createRequire(import.meta.url); // This might be removable if not used elsewhere
 
 createConfigIfNeeded('./config/config.json');
 
-let config = require("./config/config.json");
-logger("Config file loaded", 'INFO');
+// let config = require("./config/config.json"); // Removed as config is loaded by rescheduleAllFromConfig
+// logger("Config file loaded", 'INFO'); // Removed
 
-function updateVariables() {
-
-    delete require.cache[require.resolve('./config/config.json')]   // Deleting loaded module
-    config = require("./config/config.json");
-    const globalConfig = {
-        debuggingEnv: config.debuggingEnv,
-        tumblrBlogName: config.tumblrBlogName,
-        discordChannelName: config.discordChannelName
-        // Add any other global settings from config here
-    };
-
-    // Cancel any existing jobs before rescheduling
-    cancelAllJobs();
-
-    for (var i = 0; i < config.slots.length; i++) {
-        // Ensure we are passing the individual slot object and the global config
-        scheduleSlot(config.slots[i], globalConfig);
-    }
-
-}
+// function updateVariables() { // Removed function
+//
+//     delete require.cache[require.resolve('./config/config.json')]   // Deleting loaded module
+//     config = require("./config/config.json");
+//     const globalConfig = {
+//         debuggingEnv: config.debuggingEnv,
+//         tumblrBlogName: config.tumblrBlogName,
+//         discordChannelName: config.discordChannelName
+//         // Add any other global settings from config here
+//     };
+//
+//     // Cancel any existing jobs before rescheduling
+//     cancelAllJobs();
+//
+//     for (var i = 0; i < config.slots.length; i++) {
+//         // Ensure we are passing the individual slot object and the global config
+//         scheduleSlot(config.slots[i], globalConfig);
+//     }
+//
+// }
 
 ///Initialization
 
@@ -50,7 +50,7 @@ escExit();
 
 let uptime = 0;
 
-updateVariables()
+rescheduleAllFromConfig(); // Replaced call to updateVariables
 
 ///Uptime message
 

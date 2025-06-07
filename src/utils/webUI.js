@@ -4,6 +4,7 @@ import bodyParser from 'body-parser';
 import fs from 'fs';
 import path from 'path'; // Added path import
 import { fileURLToPath } from 'url'; // Added for ES module __dirname equivalent
+import { rescheduleAllFromConfig } from './scheduler.js'; // Import reschedule function
 
 // escapeHtml can be removed if not used anywhere else on server-side
 // function escapeHtml(unsafe) { ... } 
@@ -133,6 +134,9 @@ export async function startServer() {
                 return res.status(500).json({ message: "Failed to save slot configuration.", error: err.message });
             }
             res.json({ message: "Slot saved successfully." });
+            // After sending response, trigger rescheduling
+            logger("[WebUI] Config changed via /saveSlot. Triggering scheduler update.", "INFO");
+            rescheduleAllFromConfig();
         });
     });
 
@@ -157,6 +161,9 @@ export async function startServer() {
                 return res.status(500).json({ message: "Failed to delete slot.", error: err.message });
             }
             res.json({ message: "Slot deleted successfully." });
+            // After sending response, trigger rescheduling
+            logger("[WebUI] Config changed via /deleteSlot. Triggering scheduler update.", "INFO");
+            rescheduleAllFromConfig();
         });
     });
 
@@ -183,10 +190,13 @@ export async function startServer() {
                 logger("Error writing config file for /addSlot: " + String(err), 'ERROR');
                 return res.status(500).json({ message: "Failed to add new slot.", error: err.message });
             }
-            res.json({
+            res.json({ // Send response to client
                 message: "New slot added successfully.",
                 index: currentConfig.slots.length - 1
             });
+            // After sending response, trigger rescheduling
+            logger("[WebUI] Config changed via /addSlot. Triggering scheduler update.", "INFO");
+            rescheduleAllFromConfig(); // Call the imported function
         });
     });
 

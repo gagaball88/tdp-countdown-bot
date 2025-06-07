@@ -12,15 +12,18 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentSlots = [];
 
     // Function to display the latest picture
-    // This is a placeholder. Actual implementation might need to fetch picture names
-    // or rely on information from the initial data or SSE.
-    function displayLatestPicture(pictureFilename) {
-        if (pictureFilename) {
-            latestPictureImg.src = `/pictures/${pictureFilename}`; // Assuming pictures are served from /pictures
+    function displayLatestPicture() {
+        const imageUrl = '/pictures/temp_img.jpg';
+        // Check if latestPictureImg element exists
+        if (latestPictureImg) {
+            // Append a timestamp to prevent caching if the image updates frequently
+            latestPictureImg.src = `${imageUrl}?t=${new Date().getTime()}`;
             latestPictureImg.style.display = 'block';
-            noPictureMessage.style.display = 'none';
-        } else {
-            latestPictureImg.style.display = 'none';
+            if (noPictureMessage) { // Check if noPictureMessage element exists
+                 noPictureMessage.style.display = 'none';
+            }
+        } else if (noPictureMessage) { // If image element doesn't exist, but message element does
+            noPictureMessage.textContent = "Latest picture display element not found.";
             noPictureMessage.style.display = 'block';
         }
     }
@@ -32,11 +35,7 @@ document.addEventListener('DOMContentLoaded', () => {
             currentSlots = data.slots || [];
             renderSlots();
             data.initialMessages.forEach(log => appendLog(log));
-            // Assuming the backend might send a 'latestPicture' field in initial-data
-            // Or, if the latest picture is always the 'pictureSlot' of the first active slot,
-            // you might derive it here. For now, let's assume it's not directly available
-            // and needs a more specific mechanism or user input to set.
-            // displayLatestPicture(data.latestPicture); // Example
+            // displayLatestPicture(); // Called at the end of DOMContentLoaded instead
         })
         .catch(error => console.error('Error fetching initial data:', error));
 
@@ -236,14 +235,11 @@ document.addEventListener('DOMContentLoaded', () => {
             renderSlots();
             // If a pictureSlot was saved, attempt to display it.
             // This assumes that saving a slot might change the "latest picture".
-            if (slotData.pictureSlot) {
-                displayLatestPicture(slotData.pictureSlot);
-            } else {
-                // Potentially try to find another picture to display or clear it
-                // For now, if current slot had a picture and it's removed, it won't clear
-                // unless displayLatestPicture is called with null/undefined.
-                // A more robust picture display logic is needed.
-            }
+            // if (slotData.pictureSlot) { // Removed dynamic picture display based on slot
+            //     displayLatestPicture(slotData.pictureSlot);
+            // } else {
+            // } // All calls to displayLatestPicture with arguments are removed.
+            // The new displayLatestPicture() will be called on load and potentially by an interval.
         })
         .catch(error => {
             console.error('Error saving slot:', error);
@@ -280,16 +276,21 @@ document.addEventListener('DOMContentLoaded', () => {
     // Initial call to display a picture if one is available (e.g. from a default slot)
     // This needs a defined logic, e.g., finding the first active slot with a picture.
     // For now, it will show "No picture available yet." by default.
-    // displayLatestPicture(findInitialPicture(currentSlots));
+    // displayLatestPicture(findInitialPicture(currentSlots)); // Removed
 
     // Placeholder: How to determine the "latest" picture?
     // Option 1: Backend sends it in /api/initial-data.
     // Option 2: SSE event specifically for picture updates.
     // Option 3: Client derives it (e.g., picture from the most recently active slot, or a designated "main" picture slot).
-    // For now, the picture will only update if a slot is saved AND has a pictureSlot value.
+
+    displayLatestPicture(); // Call it on load
+
+    // Potentially set an interval if the image is expected to change dynamically
+    // and you want the UI to refresh it without a full page reload.
+    // setInterval(displayLatestPicture, 60000); // Refresh every 60 seconds, for example
 });
 
-// Example helper: function findInitialPicture(slots) {
+// Example helper: function findInitialPicture(slots) { // This helper is no longer used
 //    const activeSlotWithPic = slots.find(s => s.active && s.pictureSlot);
 //    return activeSlotWithPic ? activeSlotWithPic.pictureSlot : null;
 // }
