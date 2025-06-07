@@ -1,5 +1,36 @@
 # Changelog
 
+7.0.0_alpha2
+
+**Fix:** (652ca8bf) Improved error handling to prevent crashes when pictures are not found or other unexpected errors occur.
+    - Enhanced error logging in the scheduler (`src/utils/scheduler.js`) for `initPost` failures.
+    - Added global error handlers in `src/main.js` for unhandled promise rejections and uncaught exceptions, ensuring the application exits gracefully after logging critical errors.
+    - Ensured `refreshPic` in `src/utils/initPost.js` correctly handles picture fetching errors, allowing the process to continue without a picture.
+    - Modified `src/utils/refreshPic.js` to attempt deletion of potentially corrupted temporary images upon error.
+
+**Feature:** (086b3a80) The `pictures/endings` subfolder is now automatically created if it doesn't exist when `refreshPic.js` initializes the `pictures` directory. This ensures the expected directory structure for ending-specific images is always present.
+
+**Fix:** (a0942417) Corrected the configuration file structure (`src/config/config.json`) by adding the required `settings` section.
+    - Moved `debuggingEnv` into the `settings` object.
+    - Added `tumblrBlogName` and `discordChannelName` to `settings` with default empty string values to prevent errors in the scheduler which expects these fields.
+
+**Feature:** (b64b8762) Implemented dynamic cron job rescheduling and corrected picture display in the WebUI.
+    - **Dynamic Cron Rescheduling**:
+        - Scheduler (`src/utils/scheduler.js`) now includes `rescheduleAllFromConfig()` to reload and apply configuration changes from `config.json` without a manual restart. This function is called on startup and after any slot modifications via the WebUI.
+        - WebUI (`src/utils/webUI.js`) now triggers `rescheduleAllFromConfig()` after slots are added, saved, or deleted.
+    - **WebUI Picture Display**:
+        - The "Latest Picture" in the WebUI (`src/web_public/script.js`) now consistently displays `/pictures/temp_img.jpg` and appends a timestamp to the URL to avoid caching issues, ensuring the most recent image is shown.
+
+**Fix:** (3acdc075) Resolved an issue in the WebUI where saving a newly added slot would result in a 404 error.
+    - Corrected index propagation in `src/web_public/script.js` to ensure the correct slot index is used when saving a new slot.
+    - Added improved error handling and logging for the slot addition and saving process in the WebUI.
+
+**Fix:** (87eeab3d) Corrected path resolution for static files and `index.html` in the WebUI (`src/utils/webUI.js`). Paths were changed from `src/web_public` to `../src/web_public` to ensure they resolve correctly from the project root, regardless of the application's startup directory. This fixes issues with the WebUI failing to load.
+
+**Refactor:** (e249a46c) Standardized logger usage and corrected logger method calls.
+    - The logger function in `src/utils/logger.js` now accepts an optional log level (e.g., 'INFO', 'ERROR') as its second argument (defaulting to 'INFO') and concatenates all arguments into a single message.
+    - Replaced all incorrect `logger.error(...)` and `logger.info(...)` calls with the standardized `logger(message, 'LEVEL')` format throughout the codebase (e.g., in `config.js`, `main.js`, `initPost.js`, `refreshPic.js`, `scheduler.js`, `sendPost.js`, `webUI.js`).
+
 7.0.0_alpha
 
 **Features:**
