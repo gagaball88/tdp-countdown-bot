@@ -79,7 +79,18 @@ document.addEventListener('DOMContentLoaded', () => {
     // SSE for logs
     const eventSource = new EventSource('/events');
     eventSource.onmessage = event => {
-        appendLog(event.data);
+        try {
+            const data = JSON.parse(event.data);
+            if (data && data.type === "new_picture") {
+                displayLatestPicture();
+            } else {
+                // If it's not a new_picture event, treat it as a log message
+                appendLog(event.data);
+            }
+        } catch (e) {
+            // If parsing fails, assume it's a plain text log message
+            appendLog(event.data);
+        }
     };
     eventSource.onerror = error => {
         console.error('SSE error:', error);
