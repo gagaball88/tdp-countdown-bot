@@ -1,78 +1,78 @@
 import logger from './utils/logger.js';
-import taskPlanner from './utils/taskPlanner.js';
+// import taskPlanner from './utils/taskPlanner.js'; // taskPlanner is now deprecated
+import { rescheduleAllFromConfig } from './utils/scheduler.js'; // Changed import
 import { startServer } from './utils/webUI.js';
 import escExit from 'esc-exit';
 import player from 'play-sound';
 import { createConfigIfNeeded } from './config/config.js';
 import { createRequire } from "module";
-const require = createRequire(import.meta.url);
+const require = createRequire(import.meta.url); // This might be removable if not used elsewhere
+
+// Global Error Handlers
+process.on('unhandledRejection', (reason, promise) => {
+    try {
+        const reasonMessage = reason instanceof Error ? reason.message : String(reason);
+        const reasonStack = reason instanceof Error ? reason.stack : 'No stack available.';
+        // It's hard to serialize a Promise reliably, so we'll focus on the reason.
+        logger(`[GLOBAL_HANDLER] Unhandled Rejection at: Promise, Reason: ${reasonMessage}
+Stack: ${reasonStack}`, 'CRITICAL');
+    } catch (loggingError) {
+        console.error(`[GLOBAL_HANDLER] CRITICAL: Failed to log Unhandled Rejection. Original reason: ${String(reason)}. Logging error: ${String(loggingError)}`);
+    }
+    // Consider whether to exit or not. For now, just log.
+    // process.exit(1); // Optional: exit application
+});
+
+process.on('uncaughtException', (error) => {
+    try {
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        const errorStack = error instanceof Error ? error.stack : 'No stack available.';
+        logger(`[GLOBAL_HANDLER] Uncaught Exception: ${errorMessage}
+Stack: ${errorStack}`, 'CRITICAL');
+    } catch (loggingError) {
+        console.error(`[GLOBAL_HANDLER] CRITICAL: Failed to log Uncaught Exception. Original error: ${String(error)}. Logging error: ${String(loggingError)}`);
+    }
+    // It's generally recommended to exit after an uncaught exception,
+    // as the application might be in an inconsistent state.
+    logger('[GLOBAL_HANDLER] Uncaught exception detected. Application will now exit.', 'CRITICAL');
+    process.exit(1);
+});
 
 createConfigIfNeeded('./config/config.json');
 
-let config = require("./config/config.json");
-logger("Config file loaded");
+// let config = require("./config/config.json"); // Removed as config is loaded by rescheduleAllFromConfig
+// logger("Config file loaded", 'INFO'); // Removed
 
-let slotHour, slotDay, slotMonth, slotYear, message1Slot, message2Slot, messageEndSlot, pictureEndSlot, activeSlot, modeSlot, accuracySlot, dayCountSlot, pictureSlot, postTimeSlot
-
-function updateVariables() {
-
-    delete require.cache[require.resolve('./config/config.json')]   // Deleting loaded module
-    config = require("./config/config.json");
-
-    for (var i = 0; i < config.slots.length; i++) {
-        slotHour = config.slots[i].hour;
-        slotDay = config.slots[i].day;
-        slotMonth = config.slots[i].month;
-        slotYear = config.slots[i].year;
-
-        message1Slot = config.slots[i].message1;
-        message2Slot = config.slots[i].message2;
-        messageEndSlot = config.slots[i].messageEnd;
-
-        pictureEndSlot = config.slots[i].pictureEnd;
-
-        activeSlot = config.slots[i].active;
-        modeSlot = config.slots[i].mode;
-        accuracySlot = config.slots[i].accuracy;
-        dayCountSlot = config.slots[i].dayCount;
-        pictureSlot = config.slots[i].pictureSlot;
-        postTimeSlot = config.slots[i].postTime;
-
-        taskPlanner([
-            /*0: hour to count to/from*/        slotHour,
-            /*1: day to count to/from*/         slotDay,
-            /*2: month to count to/from*/       slotMonth,
-            /*3: year to count to/from*/        slotYear,
-            /*4: message before time*/          message1Slot,
-            /*5: message after time*/           message2Slot,
-            /*6: message for end message*/      messageEndSlot,
-            /*7: filename of end picture*/      pictureEndSlot,
-            /*8: is slot active? 
-                (true/false)*/                  activeSlot,
-            /*9: "countdown/countup"*/          modeSlot,
-            /*10: accuracy of time output: 
-                0 = Years,
-                1 = Months, 
-                2 = Days, 
-                3 = Hours, 
-                4 = Minutes, 
-                5 = Dynamic*/                   accuracySlot,
-            /*11: is day count active 
-                (true/false)*/                  dayCountSlot,
-            /*12: picture category selection
-                (example: "s3e5,s3e9")*/        pictureSlot,
-            /*13: hour of the day*/             postTimeSlot
-        ]);
-
-    }
-
-}
+// function updateVariables() { // Removed function
+//
+//     delete require.cache[require.resolve('./config/config.json')]   // Deleting loaded module
+//     config = require("./config/config.json");
+//     const globalConfig = {
+//         debuggingEnv: config.debuggingEnv,
+//         tumblrBlogName: config.tumblrBlogName,
+//         discordChannelName: config.discordChannelName
+//         // Add any other global settings from config here
+//     };
+//
+//     // Cancel any existing jobs before rescheduling
+//     cancelAllJobs();
+//
+//     for (var i = 0; i < config.slots.length; i++) {
+//         // Ensure we are passing the individual slot object and the global config
+//         scheduleSlot(config.slots[i], globalConfig);
+//     }
+//
+// }
 
 ///Initialization
 
 console.log("To quit, press ESC or Ctrl-C\n\n");
-logger("Bot started successfully\n");
-player().play('./sounds/start.mp3');
+logger("Bot started successfully\n", 'INFO');
+try {
+    player().play('./sounds/start.mp3');
+} catch (e) {
+    logger("Failed to play startup sound './sounds/start.mp3' " + String(e), 'ERROR');
+}
 startServer();
 
 
@@ -80,15 +80,15 @@ escExit();
 
 let uptime = 0;
 
-updateVariables()
+rescheduleAllFromConfig(); // Replaced call to updateVariables
 
 ///Uptime message
 
 setInterval(() => {
     uptime = uptime + 12;
-    logger("Everything's working fine for " + uptime + " hours now :)");
+    logger("Everything's working fine for " + uptime + " hours now :)", 'INFO');
 }, 12 * 60 * 60 * 1000)
 
-setInterval(() => {
-    updateVariables()
-}, 60 * 1000)
+// setInterval(() => {
+//     updateVariables()
+// }, 60 * 1000) // This interval is removed as per requirements
