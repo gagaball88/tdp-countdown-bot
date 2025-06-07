@@ -15,7 +15,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const discordChannelNameInput = document.getElementById('discordChannelName');
     const saveSettingsBtn = document.getElementById('save-settings-btn');
 
+    // Log Level Toggles
+    const logLevelToggles = {
+        DEBUG: document.getElementById('log-debug'),
+        INFO: document.getElementById('log-info'),
+        WARN: document.getElementById('log-warn'),
+        ERROR: document.getElementById('log-error')
+    };
+
     let currentSlots = [];
+    let allLogs = []; // Stores all log messages
 
     // Function to display the latest picture
     function displayLatestPicture() {
@@ -49,7 +58,8 @@ document.addEventListener('DOMContentLoaded', () => {
         .then(data => {
             currentSlots = data.slots || [];
             renderSlots();
-            data.initialMessages.forEach(log => appendLog(log));
+            allLogs = data.initialMessages || []; // Store initial logs
+            renderFilteredLogs(); // Render logs based on default toggle states
             // displayLatestPicture(); // Called at the end of DOMContentLoaded instead
         })
         .catch(error => console.error('Error fetching initial data:', error));
@@ -94,15 +104,56 @@ document.addEventListener('DOMContentLoaded', () => {
     };
     eventSource.onerror = error => {
         console.error('SSE error:', error);
-        appendLog('Error connecting to real-time log updates.');
+        const errorLog = "ERROR: Error connecting to real-time log updates.";
+        allLogs.push(errorLog);
+        appendLog(errorLog);
     };
 
-    function appendLog(message) {
-        const logEntry = document.createElement('div');
-        logEntry.textContent = message; // Server sends plain text, no need to escape here for textContent
-        logsContainer.appendChild(logEntry);
+    // Parses log level from message string. Expects "LEVEL: message"
+    function parseLogLevel(message) {
+        const parts = message.match(/^([A-Z]+):/);
+        if (parts && parts.length > 1) {
+            const level = parts[1].toUpperCase();
+            if (['DEBUG', 'INFO', 'WARN', 'ERROR'].includes(level)) {
+                return level;
+            }
+        }
+        return 'INFO'; // Default level if parsing fails or level is unknown
+    }
+
+    function renderFilteredLogs() {
+        logsContainer.innerHTML = ''; // Clear existing logs
+        allLogs.forEach(message => {
+            const level = parseLogLevel(message);
+            if (logLevelToggles[level] && logLevelToggles[level].checked) {
+                const logEntry = document.createElement('div');
+                logEntry.textContent = message;
+                logEntry.classList.add(`log-${level.toLowerCase()}`); // Optional: for level-specific styling
+                logsContainer.appendChild(logEntry);
+            }
+        });
         logsContainer.scrollTop = logsContainer.scrollHeight; // Scroll to bottom
     }
+
+    // This function now only appends a single log if it passes the filter
+    // It's mainly called by the SSE handler for new incoming logs.
+    function appendLog(message) {
+        const level = parseLogLevel(message);
+        if (logLevelToggles[level] && logLevelToggles[level].checked) {
+            const logEntry = document.createElement('div');
+            logEntry.textContent = message;
+            logEntry.classList.add(`log-${level.toLowerCase()}`);
+            logsContainer.appendChild(logEntry);
+            logsContainer.scrollTop = logsContainer.scrollHeight;
+        }
+    }
+
+    // Add event listeners to log level toggles
+    Object.values(logLevelToggles).forEach(toggle => {
+        if (toggle) { // Ensure toggle element exists
+            toggle.addEventListener('change', renderFilteredLogs);
+        }
+    });
 
     function renderSlots() {
         slotsContainer.innerHTML = ''; // Clear existing slots
@@ -371,6 +422,46 @@ document.addEventListener('DOMContentLoaded', () => {
     // Potentially set an interval if the image is expected to change dynamically
     // and you want the UI to refresh it without a full page reload.
     // setInterval(displayLatestPicture, 60000); // Refresh every 60 seconds, for example
+
+    // Dark Mode Toggle Functionality
+    const darkModeToggle = document.getElementById('darkModeToggle');
+
+    function enableDarkMode() {
+        document.body.classList.add('dark-mode');
+        localStorage.setItem('darkMode', 'enabled');
+        if (darkModeToggle) darkModeToggle.checked = true;
+    }
+
+    function disableDarkMode() {
+        document.body.classList.remove('dark-mode');
+        localStorage.setItem('darkMode', 'disabled');
+        if (darkModeToggle) darkModeToggle.checked = false;
+    }
+
+    // Check localStorage for dark mode preference
+    // Default to dark mode if no preference is set
+    if (localStorage.getItem('darkMode') === 'disabled') {
+        disableDarkMode();
+    } else {
+        enableDarkMode(); // Default to dark mode
+    }
+    // Apply default log toggle states (already set in HTML, but good to be explicit if needed)
+    // logLevelToggles.DEBUG.checked = false;
+    // logLevelToggles.INFO.checked = true;
+    // logLevelToggles.WARN.checked = true;
+    // logLevelToggles.ERROR.checked = true;
+    // renderFilteredLogs(); // Initial render based on defaults - already called after fetching initial data
+
+
+    if (darkModeToggle) {
+        darkModeToggle.addEventListener('change', () => {
+            if (darkModeToggle.checked) {
+                enableDarkMode();
+            } else {
+                disableDarkMode();
+            }
+        });
+    }
 });
 
 // Example helper: function findInitialPicture(slots) { // This helper is no longer used

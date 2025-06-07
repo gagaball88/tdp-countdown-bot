@@ -7,17 +7,30 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h1>WebUI</h1>
+    <h1>WebUI
+        <label class="switch">
+            <input type="checkbox" id="darkModeToggle">
+            <span class="slider round"></span>
+        </label>
+    </h1>
 
-    <div id="picture-section">
-        <h2>Latest Picture</h2>
-        <img id="latest-picture" src="" alt="Latest Picture" style="max-width: 500px; display: none;">
-        <p id="no-picture-message">No picture available yet.</p>
-    </div>
+    <div id="top-content-wrapper">
+        <div id="logs-section">
+            <h2>Logs</h2>
+            <div id="log-level-toggles">
+                <label><input type="checkbox" id="log-debug" value="DEBUG"> Debug</label>
+                <label><input type="checkbox" id="log-info" value="INFO" checked> Info</label>
+                <label><input type="checkbox" id="log-warn" value="WARN" checked> Warning</label>
+                <label><input type="checkbox" id="log-error" value="ERROR" checked> Error</label>
+            </div>
+            <div id="logs-container"></div>
+        </div>
 
-    <div id="logs-section">
-        <h2>Logs</h2>
-        <div id="logs-container"></div>
+        <div id="picture-section">
+            <h2>Latest Picture</h2>
+            <img id="latest-picture" src="" alt="Latest Picture" style="max-width: 500px; display: none;">
+            <p id="no-picture-message">No picture available yet.</p>
+        </div>
     </div>
 
     <div id="slots-section">
