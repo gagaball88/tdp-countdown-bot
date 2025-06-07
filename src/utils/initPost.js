@@ -23,11 +23,11 @@ export default async function initPost(postDetails) {
         if (pictureSlot && typeof pictureSlot === 'string' && pictureSlot.trim() !== '') {
             picture = await refreshPic(pictureSlot);
         } else {
-            // logger(`[initPost] No pictureSlot defined or is empty. Proceeding without picture refresh.`, 'DEBUG');
+            // logger('DEBUG', `[initPost] No pictureSlot defined or is empty. Proceeding without picture refresh.`);
             picture = null;
         }
     } catch (error) {
-        logger(`[initPost] Failed to refresh picture using slot '${pictureSlot}'. Error: ${String(error)}`, 'ERROR');
+        logger('ERROR', `[initPost] Failed to refresh picture using slot '${pictureSlot}'. Error: ${String(error)}`);
         picture = null; // Ensure picture is null if refreshPic fails
     }
 
@@ -36,7 +36,7 @@ export default async function initPost(postDetails) {
             picture = path.join(pictureEndDir, pictureEnd);
         } else {
             // If pictureEnd is also not available, picture remains null (or its state from the try-catch, which should be null on failure)
-            logger(`[initPost] Countdown over, but no pictureEnd defined or is empty. Picture will remain as is (likely null).`, 'WARN');
+            logger('WARN', `[initPost] Countdown over, but no pictureEnd defined or is empty. Picture will remain as is (likely null).`);
             if (picture === undefined) { // Should not happen if initialized to null, but as a safeguard
                 picture = null;
             }
@@ -47,20 +47,19 @@ export default async function initPost(postDetails) {
 
     if (!debuggingEnv) {
         
-        if (!over) {logger('Sending message: ' + message, 'INFO');}
-        else {logger('Sending message: ' + message + '\nPicture: ' + picture + '\n..........', 'INFO');}
+        if (!over) {logger('INFO', `Sending message: ${message}`);}
+        else {logger('INFO', `Sending message: ${message}\nPicture: ${picture}\n..........`);}
 
         try {
             await sendTweet(message, picture);
             try {
                 player().play('./sounds/notify.mp3');
             } catch (soundError) {
-                logger("Failed to play notification sound after Tweet './sounds/notify.mp3' " + String(soundError), 'ERROR');
+                logger('WARN', `Failed to play notification sound after Tweet './sounds/notify.mp3' ${String(soundError)}`);
             }
         }
         catch (e) {
-            logger('!!!WARNING!!!\n\nTweet not sent!\n\nPicture used:' + picture + '\n\nError log:', 'INFO')
-            logger(String(e), 'INFO');
+            logger('WARN', `Failed to send Tweet. Picture used: ${picture}. Error: ${String(e)}`);
         }
 
         try {
@@ -68,12 +67,11 @@ export default async function initPost(postDetails) {
             try {
                 player().play('./sounds/notify.mp3');
             } catch (soundError) {
-                logger("Failed to play notification sound after Bluesky post './sounds/notify.mp3' " + String(soundError), 'ERROR');
+                logger('WARN', `Failed to play notification sound after Bluesky post './sounds/notify.mp3' ${String(soundError)}`);
             }
         }
         catch(e) {
-            logger('!!!WARNING!!!\n\nBluesky Post not sent!\n\nPicture used:' + picture + '\n\nError log:', 'INFO')
-            logger(String(e), 'INFO');
+            logger('WARN', `Failed to send Bluesky post. Picture used: ${picture}. Error: ${String(e)}`);
         }
 
         try {
@@ -81,12 +79,11 @@ export default async function initPost(postDetails) {
             try {
                 player().play('./sounds/notify.mp3');
             } catch (soundError) {
-                logger("Failed to play notification sound after Mastodon post './sounds/notify.mp3' " + String(soundError), 'ERROR');
+                logger('WARN', `Failed to play notification sound after Mastodon post './sounds/notify.mp3' ${String(soundError)}`);
             }
         }
         catch(e) {
-            logger('!!!WARNING!!!\n\nMastodon message not sent!\n\nPicture used:' + picture + '\n\nError log:', 'INFO')
-            logger(String(e), 'INFO');
+            logger('WARN', `Failed to send Mastodon post. Picture used: ${picture}. Error: ${String(e)}`);
         }
 
         try {
@@ -94,12 +91,11 @@ export default async function initPost(postDetails) {
             try {
                 player().play('./sounds/notify.mp3');
             } catch (soundError) {
-                logger("Failed to play notification sound after Tumblr post './sounds/notify.mp3' " + String(soundError), 'ERROR');
+                logger('WARN', `Failed to play notification sound after Tumblr post './sounds/notify.mp3' ${String(soundError)}`);
             }
         }
         catch(e) {
-            logger('!!!WARNING!!!\n\nTumblr message not sent!\n\nPicture used:' + picture + '\n\nError log:', 'INFO')
-            logger(String(e), 'INFO');
+            logger('WARN', `Failed to send Tumblr post. Picture used: ${picture}. Error: ${String(e)}`);
         }
         
 
@@ -108,19 +104,18 @@ export default async function initPost(postDetails) {
             try {
                 player().play('./sounds/notify.mp3');
             } catch (soundError) {
-                logger("Failed to play notification sound after Discord post './sounds/notify.mp3' " + String(soundError), 'ERROR');
+                logger('WARN', `Failed to play notification sound after Discord post './sounds/notify.mp3' ${String(soundError)}`);
             }
         }
         catch(e) {
-            logger('!!!WARNING!!!\n\nDiscord message not sent!\n\nPicture used:' + picture + '\n\nError log:', 'INFO')
-            logger(String(e), 'INFO');
+            logger('WARN', `Failed to send Discord message. Picture used: ${picture}. Error: ${String(e)}`);
         }
 
     }
-    else logger("Program in debug mode. Message: " + message + " " + picture, 'INFO');
+    else logger('DEBUG', `Program in debug mode. Message: ${message} ${picture}`);
     try {
         player().play('./sounds/notify.mp3');
     } catch (e) {
-        logger("Failed to play final notification sound './sounds/notify.mp3' " + String(e), 'ERROR');
+        logger('WARN', `Failed to play final notification sound './sounds/notify.mp3' ${String(e)}`);
     }
 }

@@ -14,8 +14,7 @@ process.on('unhandledRejection', (reason, promise) => {
         const reasonMessage = reason instanceof Error ? reason.message : String(reason);
         const reasonStack = reason instanceof Error ? reason.stack : 'No stack available.';
         // It's hard to serialize a Promise reliably, so we'll focus on the reason.
-        logger(`[GLOBAL_HANDLER] Unhandled Rejection at: Promise, Reason: ${reasonMessage}
-Stack: ${reasonStack}`, 'CRITICAL');
+        logger('ERROR', `[GLOBAL_HANDLER] Unhandled Rejection at: Promise, Reason: ${reasonMessage}\nStack: ${reasonStack}`);
     } catch (loggingError) {
         console.error(`[GLOBAL_HANDLER] CRITICAL: Failed to log Unhandled Rejection. Original reason: ${String(reason)}. Logging error: ${String(loggingError)}`);
     }
@@ -27,14 +26,13 @@ process.on('uncaughtException', (error) => {
     try {
         const errorMessage = error instanceof Error ? error.message : String(error);
         const errorStack = error instanceof Error ? error.stack : 'No stack available.';
-        logger(`[GLOBAL_HANDLER] Uncaught Exception: ${errorMessage}
-Stack: ${errorStack}`, 'CRITICAL');
+        logger('ERROR', `[GLOBAL_HANDLER] Uncaught Exception: ${errorMessage}\nStack: ${errorStack}`);
     } catch (loggingError) {
         console.error(`[GLOBAL_HANDLER] CRITICAL: Failed to log Uncaught Exception. Original error: ${String(error)}. Logging error: ${String(loggingError)}`);
     }
     // It's generally recommended to exit after an uncaught exception,
     // as the application might be in an inconsistent state.
-    logger('[GLOBAL_HANDLER] Uncaught exception detected. Application will now exit.', 'CRITICAL');
+    logger('ERROR', '[GLOBAL_HANDLER] Uncaught exception detected. Application will now exit.');
     process.exit(1);
 });
 
@@ -67,11 +65,11 @@ createConfigIfNeeded('./config/config.json');
 ///Initialization
 
 console.log("To quit, press ESC or Ctrl-C\n\n");
-logger("Bot started successfully\n", 'INFO');
+logger('INFO', "Bot started successfully\n");
 try {
     player().play('./sounds/start.mp3');
 } catch (e) {
-    logger("Failed to play startup sound './sounds/start.mp3' " + String(e), 'ERROR');
+    logger('ERROR', `Failed to play startup sound './sounds/start.mp3' ${String(e)}`);
 }
 startServer();
 
@@ -86,7 +84,7 @@ rescheduleAllFromConfig(); // Replaced call to updateVariables
 
 setInterval(() => {
     uptime = uptime + 12;
-    logger("Everything's working fine for " + uptime + " hours now :)", 'INFO');
+    logger('DEBUG', `Everything's working fine for ${uptime} hours now :)`);
 }, 12 * 60 * 60 * 1000)
 
 // setInterval(() => {

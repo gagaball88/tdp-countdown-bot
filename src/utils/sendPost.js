@@ -17,7 +17,7 @@ const blueskyClient = new AtpAgent({
   service: 'https://bsky.social'
 });
 try { await blueskyClient.login(blueskyConfig) }
-catch (e) { logger(String(e), 'INFO') }
+catch (e) { logger('ERROR', `Bluesky login failed: ${String(e)}`) }
 
 const mastodonClient = createRestAPIClient(mastodonConfig);
 
@@ -34,7 +34,7 @@ export async function sendTweet(message, imagePath) {
   ]);
 
   await twitterClient.v2.tweet({ text: message, media: { media_ids: mediaId } });
-  logger("Tweet sent", 'INFO');
+  logger('DEBUG', "Tweet sent");
 
 }
 
@@ -63,7 +63,7 @@ export async function sendBluesky(message, imagePath) {
     },
   });
 
-  logger("Bluesky post sent", 'INFO');
+  logger('DEBUG', "Bluesky post sent");
 }
 
 export async function sendMastodon(message, imagePath) {
@@ -79,7 +79,7 @@ export async function sendMastodon(message, imagePath) {
     mediaIds: [attachment1.id],
   });
 
-  logger("Mastodon post sent", 'INFO');
+  logger('DEBUG', "Mastodon post sent");
 
 }
 
@@ -103,7 +103,7 @@ export async function sendTumblr(message, imagePath, blogName) {
     tags: [tags]
   });
 
-  logger("Tumblr post sent", 'INFO');
+  logger('DEBUG', "Tumblr post sent");
 
 }
 
@@ -120,7 +120,7 @@ export async function sendDiscord(message, imagePath, channelName) {
     const channel = guild.channels.cache.find(ch => ch.name === channelName)
 
     let serverName = guild.name;
-    logger("...sending on Server: " + serverName, 'INFO')
+    logger('DEBUG', `...sending on Server: ${serverName}`)
 
     try {
       await channel.send({
@@ -134,11 +134,11 @@ export async function sendDiscord(message, imagePath, channelName) {
     }
 
     catch (e) {
-      logger(String(e), 'INFO');
+      logger('ERROR', `Failed to send Discord message to channel in server ${serverName}: ${String(e)}`);
     }
 
   })
 
-  logger("Discord messages sent", 'INFO');
+  logger('DEBUG', "Discord messages sent");
 
 }
