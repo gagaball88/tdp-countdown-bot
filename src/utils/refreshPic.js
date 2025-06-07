@@ -6,11 +6,26 @@ const { Client } = pg;
 import { pgConfig } from "../config/credentials.js";
 
 const outputDir = './pictures';
+const tempImageName = 'temp_img.jpg'; // Define image name for consistency
 
 async function extractImage(categories) {
   const client = new Client(pgConfig);
+  const filePath = path.join(outputDir, tempImageName); // Define filePath early
 
   try {
+    // Ensure the output directory exists before any file operations
+    if (!fs.existsSync(outputDir)) {
+      fs.mkdirSync(outputDir, { recursive: true });
+      logger(`Created directory: ${outputDir}`, 'INFO');
+
+      // Also ensure the 'endings' subdirectory is created
+      const endingsDirPath = path.join(outputDir, 'endings');
+      if (!fs.existsSync(endingsDirPath)) {
+        fs.mkdirSync(endingsDirPath, { recursive: true });
+        logger(`Created directory: ${endingsDirPath}`, 'INFO');
+      }
+    }
+
     await client.connect();
 
     //Convert categories to a string if it's an array
@@ -44,24 +59,28 @@ async function extractImage(categories) {
 
     const picture = pictureResult.rows[0];
 
-    //Ensure the output directory exists
-    if (!fs.existsSync(outputDir)) {
-      fs.mkdirSync(outputDir, { recursive: true });
-    }
-
     //Save the picture as a file
-    const filePath = path.join(outputDir, `temp_img.jpg`);
     fs.writeFileSync(filePath, picture.picture_data);
 
     logger(`Image with ID ${picture.id} saved to ${filePath}`, 'INFO');
   } catch (error) {
     logger('Failed to extract the image: ' + String(error), 'ERROR');
+    // Attempt to delete temp_img.jpg if it exists, as it might be corrupted or from a failed previous attempt
+    try {
+      if (fs.existsSync(filePath)) {
+        fs.unlinkSync(filePath);
+        logger(`Attempted to delete potentially corrupted ${filePath} after error.`, 'INFO');
+      }
+    } catch (deleteError) {
+      logger(`Error deleting ${filePath} after an extraction error: ${String(deleteError)}`, 'ERROR');
+    }
+    throw error; // Re-throw the original error
   } finally {
     await client.end();
   }
 }
 
-export default function refreshPic(categories) {
-  extractImage(categories);
-  return path.join(outputDir, `temp_img.jpg`);
+export default async function refreshPic(categories) {
+  await extractImage(categories);
+  return path.join(outputDir, tempImageName); // Use defined constant
 }

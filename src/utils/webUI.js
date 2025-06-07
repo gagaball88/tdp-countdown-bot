@@ -64,6 +64,74 @@ export async function startServer() {
         });
     });
 
+    // API endpoint to get current settings
+    app.get("/api/settings", (req, res) => {
+        try {
+            const configData = fs.readFileSync(configPath, 'utf-8');
+            const currentConfig = JSON.parse(configData);
+            if (currentConfig && currentConfig.settings) {
+                res.json(currentConfig.settings);
+            } else {
+                logger(`[WebUI] /api/settings: 'settings' object not found in config.json`, 'WARN');
+                res.status(404).json({ message: "Settings not found in configuration." });
+            }
+        } catch (err) {
+            logger(`[WebUI] Error reading config file for /api/settings: ${configPath} ${String(err)}`, 'ERROR');
+            res.status(500).json({ message: "Error loading settings from configuration file." });
+        }
+    });
+
+    // API endpoint to save settings
+    app.post("/api/settings/save", (req, res) => {
+        const { debuggingEnv, tumblrBlogName, discordChannelName } = req.body;
+        const errors = {};
+
+        // Validate input types
+        if (typeof debuggingEnv !== 'boolean') {
+            errors.debuggingEnv = "debuggingEnv must be a boolean (true or false).";
+        }
+        if (typeof tumblrBlogName !== 'string') {
+            errors.tumblrBlogName = "tumblrBlogName must be a string.";
+        }
+        if (typeof discordChannelName !== 'string') {
+            errors.discordChannelName = "discordChannelName must be a string.";
+        }
+
+        if (Object.keys(errors).length > 0) {
+            return res.status(400).json({ message: "Validation failed.", errors });
+        }
+
+        let currentConfig;
+        try {
+            const configData = fs.readFileSync(configPath, 'utf-8');
+            currentConfig = JSON.parse(configData);
+        } catch (err) {
+            logger(`[WebUI] Error reading config file for /api/settings/save: ${configPath} ${String(err)}`, 'ERROR');
+            return res.status(500).json({ message: "Error loading configuration file for saving." });
+        }
+
+        // Ensure settings object exists
+        if (!currentConfig.settings) {
+            currentConfig.settings = {};
+        }
+
+        // Update only the specified settings
+        currentConfig.settings.debuggingEnv = debuggingEnv;
+        currentConfig.settings.tumblrBlogName = tumblrBlogName;
+        currentConfig.settings.discordChannelName = discordChannelName;
+
+        fs.writeFile(configPath, JSON.stringify(currentConfig, null, 2), (err) => {
+            if (err) {
+                logger(`[WebUI] Error writing config file for /api/settings/save: ${String(err)}`, 'ERROR');
+                return res.status(500).json({ message: "Failed to save settings.", error: err.message });
+            }
+            res.json({ message: "Settings saved successfully." });
+            // After sending response, trigger rescheduling
+            logger("[WebUI] Settings changed via /api/settings/save. Triggering scheduler update.", "INFO");
+            rescheduleAllFromConfig();
+        });
+    });
+
     // SLOT OPERATIONS (save, delete, add)
     // These now load config on each request to ensure they have the latest data
     // and don't rely on a potentially stale 'config' variable from startServer scope.

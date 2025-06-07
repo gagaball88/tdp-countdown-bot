@@ -28,28 +28,35 @@ function getMilliseconds(slotConfig) {
 }
 
 function determineCronPattern(ms, slotConfig) {
+    logger(`[Scheduler] determineCronPattern called with ms: ${ms}, slotConfig: ${JSON.stringify(slotConfig)}`, 'DEBUG');
     const fiveMinutes = 5 * 60 * 1000;
     const oneHour = 60 * 60 * 1000;
     const twentyFourHours = 24 * 60 * 60 * 1000;
 
-    if (ms <= 0 && slotConfig.mode === 'countdown') return null; // Event is past for countdown
+    if (ms <= 0 && slotConfig.mode === 'countdown') {
+        logger(`[Scheduler] determineCronPattern result for ${slotConfig.message1}: null (event past for countdown)`, 'DEBUG');
+        return null; // Event is past for countdown
+    }
 
+    let pattern;
     if (ms < fiveMinutes) {
         logger(`[Scheduler] Slot for ${slotConfig.message1} (mode: ${slotConfig.mode}): Scheduling every minute.`, 'INFO');
-        return '* * * * *'; // Every minute
+        pattern = '* * * * *'; // Every minute
     } else if (ms < oneHour) {
         logger(`[Scheduler] Slot for ${slotConfig.message1} (mode: ${slotConfig.mode}): Scheduling every 5 minutes.`, 'INFO');
-        return '*/5 * * * *'; // Every 5 minutes
+        pattern = '*/5 * * * *'; // Every 5 minutes
     } else if (ms < twentyFourHours) {
         logger(`[Scheduler] Slot for ${slotConfig.message1} (mode: ${slotConfig.mode}): Scheduling every hour at minute 0.`, 'INFO');
-        return `0 * * * *`; // Every hour at minute 0
+        pattern = `0 * * * *`; // Every hour at minute 0
     } else {
         // Default: Daily at specified postTime (hour)
         // Ensure postTime is a valid hour (0-23)
         const postHour = (slotConfig.postTime >= 0 && slotConfig.postTime <= 23) ? slotConfig.postTime : 0;
         logger(`[Scheduler] Slot for ${slotConfig.message1} (mode: ${slotConfig.mode}): Scheduling daily at ${postHour}:00.`, 'INFO');
-        return `0 ${postHour} * * *`;
+        pattern = `0 ${postHour} * * *`;
     }
+    logger(`[Scheduler] determineCronPattern result for ${slotConfig.message1}: ${pattern}`, 'DEBUG');
+    return pattern;
 }
 
 async function performPostAction(slotConfig, globalConfig, overStatus) {
@@ -115,7 +122,7 @@ export function scheduleSlot(slotConfig, globalConfig) {
 
 
     const job = cron.schedule(cronPattern, async () => {
-        logger(`[Scheduler] Cron job triggered for slot: ${slotConfig.message1} (Mode: ${slotConfig.mode})`, 'INFO');
+        const currentTime = DateTime.now().toISO();
         const currentMs = getMilliseconds(slotConfig);
         const currentOverStatus = isOver({
             hour: slotConfig.hour,
@@ -124,6 +131,8 @@ export function scheduleSlot(slotConfig, globalConfig) {
             year: slotConfig.year,
             mode: slotConfig.mode
         });
+
+        logger(`[Scheduler] Cron job triggered for slot: ${slotConfig.message1} (Mode: ${slotConfig.mode}). Current time: ${currentTime}, currentMs: ${currentMs}, currentOverStatus: ${currentOverStatus}`, 'INFO');
 
         await performPostAction(slotConfig, globalConfig, currentOverStatus);
 
@@ -137,14 +146,14 @@ export function scheduleSlot(slotConfig, globalConfig) {
         // Dynamic rescheduling
         const newCronPattern = determineCronPattern(currentMs, slotConfig);
         if (newCronPattern !== cronPattern) {
-            logger(`[Scheduler] Rescheduling slot ${slotConfig.message1} to pattern: ${newCronPattern}`, 'INFO');
+            logger(`[Scheduler] Rescheduling slot ${slotConfig.message1}. Old pattern: ${cronPattern}, New pattern: ${newCronPattern}`, 'INFO');
             job.stop();
             activeJobs = activeJobs.filter(j => j !== job);
             if (newCronPattern) { // Only reschedule if there's a valid new pattern
                  scheduleSlot(slotConfig, globalConfig); // Re-evaluate and schedule with new pattern
             } else if (slotConfig.mode === 'countdown') {
                 // This means it became null, so event is over
-                 logger(`[Scheduler] Countdown ${slotConfig.message1} became over during rescheduling check. Final post might have occurred.`, 'INFO');
+                 logger(`[Scheduler] Countdown ${slotConfig.message1} became over during rescheduling check. Old pattern: ${cronPattern}. Final post might have occurred.`, 'INFO');
             }
         }
     }, {
