@@ -17,13 +17,13 @@ async function extractImage(categories) {
     // Ensure the output directory exists before any file operations
     if (!fs.existsSync(outputDir)) {
       fs.mkdirSync(outputDir, { recursive: true });
-      logger(`Created directory: ${outputDir}`, 'INFO');
+      logger('INFO', `Created directory: ${outputDir}`);
 
       // Also ensure the 'endings' subdirectory is created
       const endingsDirPath = path.join(outputDir, 'endings');
       if (!fs.existsSync(endingsDirPath)) {
         fs.mkdirSync(endingsDirPath, { recursive: true });
-        logger(`Created directory: ${endingsDirPath}`, 'INFO');
+        logger('INFO', `Created directory: ${endingsDirPath}`);
       }
     }
 
@@ -44,7 +44,6 @@ async function extractImage(categories) {
 
     //Generate a random index based on the total count
     const randomIndex = Math.floor(Math.random() * totalCount);
-    //logger("Total count: " + totalCount + ", Index: " + randomIndex);
 
     //Fetch the random picture based on the random index
     const pictureQuery = `
@@ -64,17 +63,17 @@ async function extractImage(categories) {
     fs.writeFileSync(filePath, picture.picture_data);
     refreshData({ "type": "new_picture", "timestamp": new Date().getTime() });
 
-    logger(`Image with ID ${picture.id} saved to ${filePath}`, 'INFO');
+    logger('INFO', `Image with ID ${picture.id} saved to ${filePath}`);
   } catch (error) {
-    logger('Failed to extract the image: ' + String(error), 'ERROR');
+    logger('ERROR', `Failed to extract the image: ${String(error)}`);
     // Attempt to delete temp_img.jpg if it exists, as it might be corrupted or from a failed previous attempt
     try {
       if (fs.existsSync(filePath)) {
         fs.unlinkSync(filePath);
-        logger(`Attempted to delete potentially corrupted ${filePath} after error.`, 'INFO');
+        logger('WARN', `Attempted to delete potentially corrupted ${filePath} after error.`);
       }
     } catch (deleteError) {
-      logger(`Error deleting ${filePath} after an extraction error: ${String(deleteError)}`, 'ERROR');
+      logger('ERROR', `Error deleting ${filePath} after an extraction error: ${String(deleteError)}`);
     }
     throw error; // Re-throw the original error
   } finally {
