@@ -24,20 +24,20 @@ export default async function initPost(postDetails) {
 
     if (!debuggingEnv) {
         
-        if (!over) {logger('Sending message: ' + message);}
-        else {logger('Sending message: ' + message + '\nPicture: ' + picture + '\n..........');}
+        if (!over) {logger('Sending message: ' + message, 'INFO');}
+        else {logger('Sending message: ' + message + '\nPicture: ' + picture + '\n..........', 'INFO');}
 
         try {
             await sendTweet(message, picture);
             try {
                 player().play('./sounds/notify.mp3');
             } catch (soundError) {
-                logger.error("Failed to play notification sound after Tweet './sounds/notify.mp3'", soundError);
+                logger("Failed to play notification sound after Tweet './sounds/notify.mp3' " + String(soundError), 'ERROR');
             }
         }
         catch (e) {
-            logger('!!!WARNING!!!\n\nTweet not sent!\n\nPicture used:' + picture + '\n\nError log:')
-            logger(e);
+            logger('!!!WARNING!!!\n\nTweet not sent!\n\nPicture used:' + picture + '\n\nError log:', 'INFO')
+            logger(String(e), 'INFO');
         }
 
         try {
@@ -45,12 +45,12 @@ export default async function initPost(postDetails) {
             try {
                 player().play('./sounds/notify.mp3');
             } catch (soundError) {
-                logger.error("Failed to play notification sound after Bluesky post './sounds/notify.mp3'", soundError);
+                logger("Failed to play notification sound after Bluesky post './sounds/notify.mp3' " + String(soundError), 'ERROR');
             }
         }
         catch(e) {
-            logger('!!!WARNING!!!\n\nBluesky Post not sent!\n\nPicture used:' + picture + '\n\nError log:')
-            logger(e);
+            logger('!!!WARNING!!!\n\nBluesky Post not sent!\n\nPicture used:' + picture + '\n\nError log:', 'INFO')
+            logger(String(e), 'INFO');
         }
 
         try {
@@ -58,12 +58,12 @@ export default async function initPost(postDetails) {
             try {
                 player().play('./sounds/notify.mp3');
             } catch (soundError) {
-                logger.error("Failed to play notification sound after Mastodon post './sounds/notify.mp3'", soundError);
+                logger("Failed to play notification sound after Mastodon post './sounds/notify.mp3' " + String(soundError), 'ERROR');
             }
         }
         catch(e) {
-            logger('!!!WARNING!!!\n\nMastodon message not sent!\n\nPicture used:' + picture + '\n\nError log:')
-            logger(e);
+            logger('!!!WARNING!!!\n\nMastodon message not sent!\n\nPicture used:' + picture + '\n\nError log:', 'INFO')
+            logger(String(e), 'INFO');
         }
 
         try {
@@ -71,12 +71,12 @@ export default async function initPost(postDetails) {
             try {
                 player().play('./sounds/notify.mp3');
             } catch (soundError) {
-                logger.error("Failed to play notification sound after Tumblr post './sounds/notify.mp3'", soundError);
+                logger("Failed to play notification sound after Tumblr post './sounds/notify.mp3' " + String(soundError), 'ERROR');
             }
         }
         catch(e) {
-            logger('!!!WARNING!!!\n\nTumblr message not sent!\n\nPicture used:' + picture + '\n\nError log:')
-            logger(e);
+            logger('!!!WARNING!!!\n\nTumblr message not sent!\n\nPicture used:' + picture + '\n\nError log:', 'INFO')
+            logger(String(e), 'INFO');
         }
         
 
@@ -85,19 +85,19 @@ export default async function initPost(postDetails) {
             try {
                 player().play('./sounds/notify.mp3');
             } catch (soundError) {
-                logger.error("Failed to play notification sound after Discord post './sounds/notify.mp3'", soundError);
+                logger("Failed to play notification sound after Discord post './sounds/notify.mp3' " + String(soundError), 'ERROR');
             }
         }
         catch(e) {
-            logger('!!!WARNING!!!\n\nDiscord message not sent!\n\nPicture used:' + picture + '\n\nError log:')
-            logger(e);
+            logger('!!!WARNING!!!\n\nDiscord message not sent!\n\nPicture used:' + picture + '\n\nError log:', 'INFO')
+            logger(String(e), 'INFO');
         }
 
     }
-    else logger("Program in debug mode. Message: " + message + " " + picture);
+    else logger("Program in debug mode. Message: " + message + " " + picture, 'INFO');
     try {
         player().play('./sounds/notify.mp3');
     } catch (e) {
-        logger.error("Failed to play final notification sound './sounds/notify.mp3'", e);
+        logger("Failed to play final notification sound './sounds/notify.mp3' " + String(e), 'ERROR');
     }
 }

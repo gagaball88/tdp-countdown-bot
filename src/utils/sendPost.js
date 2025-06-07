@@ -17,7 +17,7 @@ const blueskyClient = new AtpAgent({
   service: 'https://bsky.social'
 });
 try { await blueskyClient.login(blueskyConfig) }
-catch (e) { logger(e) }
+catch (e) { logger(String(e), 'INFO') }
 
 const mastodonClient = createRestAPIClient(mastodonConfig);
 
@@ -34,7 +34,7 @@ export async function sendTweet(message, imagePath) {
   ]);
 
   await twitterClient.v2.tweet({ text: message, media: { media_ids: mediaId } });
-  logger("Tweet sent");
+  logger("Tweet sent", 'INFO');
 
 }
 
@@ -44,7 +44,7 @@ export async function sendBluesky(message, imagePath) {
   const mimeType = mime.lookup(imagePath);
 
   if (!mimeType || !['image/png', 'image/jpeg', 'image/jpg'].includes(mimeType.toLowerCase())) {
-    logger.error(`Unsupported image type for Bluesky: ${mimeType || 'unknown'} from path ${imagePath}. Skipping Bluesky post.`);
+    logger(`Unsupported image type for Bluesky: ${mimeType || 'unknown'} from path ${imagePath}. Skipping Bluesky post.`, 'ERROR');
     return; // Stop further execution for this post
   }
 
@@ -63,7 +63,7 @@ export async function sendBluesky(message, imagePath) {
     },
   });
 
-  logger("Bluesky post sent");
+  logger("Bluesky post sent", 'INFO');
 }
 
 export async function sendMastodon(message, imagePath) {
@@ -79,7 +79,7 @@ export async function sendMastodon(message, imagePath) {
     mediaIds: [attachment1.id],
   });
 
-  logger("Mastodon post sent");
+  logger("Mastodon post sent", 'INFO');
 
 }
 
@@ -103,7 +103,7 @@ export async function sendTumblr(message, imagePath, blogName) {
     tags: [tags]
   });
 
-  logger("Tumblr post sent");
+  logger("Tumblr post sent", 'INFO');
 
 }
 
@@ -120,7 +120,7 @@ export async function sendDiscord(message, imagePath, channelName) {
     const channel = guild.channels.cache.find(ch => ch.name === channelName)
 
     let serverName = guild.name;
-    logger("...sending on Server: " + serverName)
+    logger("...sending on Server: " + serverName, 'INFO')
 
     try {
       await channel.send({
@@ -134,11 +134,11 @@ export async function sendDiscord(message, imagePath, channelName) {
     }
 
     catch (e) {
-      logger(e);
+      logger(String(e), 'INFO');
     }
 
   })
 
-  logger("Discord messages sent");
+  logger("Discord messages sent", 'INFO');
 
 }

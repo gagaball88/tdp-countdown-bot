@@ -53,9 +53,9 @@ async function extractImage(categories) {
     const filePath = path.join(outputDir, `temp_img.jpg`);
     fs.writeFileSync(filePath, picture.picture_data);
 
-    logger(`Image with ID ${picture.id} saved to ${filePath}`);
+    logger(`Image with ID ${picture.id} saved to ${filePath}`, 'INFO');
   } catch (error) {
-    logger.error('Failed to extract the image:', error);
+    logger('Failed to extract the image: ' + String(error), 'ERROR');
   } finally {
     await client.end();
   }

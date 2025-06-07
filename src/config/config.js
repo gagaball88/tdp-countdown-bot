@@ -28,7 +28,7 @@ const defaultConfig = {
 export function createConfigIfNeeded(configPath) {
     // If config file doesn't exist, create it with default data
     if (!fs.existsSync(configPath)) {
-        logger("Config file not found, creating a new one with default values...");
+        logger("Config file not found, creating a new one with default values...", 'INFO');
         fs.writeFileSync(configPath, JSON.stringify(defaultConfig, null, 2));
     }
 }

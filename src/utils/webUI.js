@@ -35,7 +35,7 @@ export async function startServer() {
         try {
             currentConfig = JSON.parse(fs.readFileSync(configPath, 'utf-8'));
         } catch (err) {
-            logger.error(`Error reading config file for /api/initial-data: ${configPath}`, err);
+            logger(`Error reading config file for /api/initial-data: ${configPath} ${String(err)}`, 'ERROR');
             return res.status(500).json({ message: "Error loading configuration." });
         }
         
@@ -70,7 +70,7 @@ export async function startServer() {
         try {
             currentConfig = JSON.parse(fs.readFileSync(configPath, 'utf-8'));
         } catch (err) {
-            logger.error(`Error reading config file for /saveSlot: ${configPath}`, err);
+            logger(`Error reading config file for /saveSlot: ${configPath} ${String(err)}`, 'ERROR');
             return res.status(500).json({ message: "Error loading configuration for saving." });
         }
 
@@ -123,7 +123,7 @@ export async function startServer() {
 
         fs.writeFile(configPath, JSON.stringify(currentConfig, null, 2), (err) => {
             if (err) {
-                logger.error("Error writing config file for /saveSlot:", err);
+                logger("Error writing config file for /saveSlot: " + String(err), 'ERROR');
                 return res.status(500).json({ message: "Failed to save slot configuration.", error: err.message });
             }
             res.json({ message: "Slot saved successfully." });
@@ -136,7 +136,7 @@ export async function startServer() {
         try {
             currentConfig = JSON.parse(fs.readFileSync(configPath, 'utf-8'));
         } catch (err) {
-            logger.error(`Error reading config file for /deleteSlot: ${configPath}`, err);
+            logger(`Error reading config file for /deleteSlot: ${configPath} ${String(err)}`, 'ERROR');
             return res.status(500).json({ message: "Error loading configuration for deletion." });
         }
 
@@ -147,7 +147,7 @@ export async function startServer() {
         
         fs.writeFile(configPath, JSON.stringify(currentConfig, null, 2), (err) => {
             if (err) {
-                logger.error("Error writing config file for /deleteSlot:", err);
+                logger("Error writing config file for /deleteSlot: " + String(err), 'ERROR');
                 return res.status(500).json({ message: "Failed to delete slot.", error: err.message });
             }
             res.json({ message: "Slot deleted successfully." });
@@ -166,7 +166,7 @@ export async function startServer() {
         try {
             currentConfig = JSON.parse(fs.readFileSync(configPath, 'utf-8'));
         } catch (err) {
-            logger.error(`Error reading config file for /addSlot: ${configPath}`, err);
+            logger(`Error reading config file for /addSlot: ${configPath} ${String(err)}`, 'ERROR');
             return res.status(500).json({ message: "Error loading configuration for adding slot." });
         }
         
@@ -174,7 +174,7 @@ export async function startServer() {
         
         fs.writeFile(configPath, JSON.stringify(currentConfig, null, 2), (err) => {
             if (err) {
-                logger.error("Error writing config file for /addSlot:", err);
+                logger("Error writing config file for /addSlot: " + String(err), 'ERROR');
                 return res.status(500).json({ message: "Failed to add new slot.", error: err.message });
             }
             res.json({
@@ -186,7 +186,7 @@ export async function startServer() {
 
     // START THE SERVER
     app.listen(PORT, () => {
-        logger(`Server running on port ${PORT}`);
+        logger(`Server running on port ${PORT}`, 'INFO');
     });
 }
 
