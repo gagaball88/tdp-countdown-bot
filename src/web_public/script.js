@@ -9,22 +9,37 @@ document.addEventListener('DOMContentLoaded', () => {
     const latestPictureImg = document.getElementById('latest-picture');
     const noPictureMessage = document.getElementById('no-picture-message');
 
+    // Global Settings Elements
+    const debuggingEnvCheckbox = document.getElementById('debuggingEnv');
+    const tumblrBlogNameInput = document.getElementById('tumblrBlogName');
+    const discordChannelNameInput = document.getElementById('discordChannelName');
+    const saveSettingsBtn = document.getElementById('save-settings-btn');
+
     let currentSlots = [];
 
     // Function to display the latest picture
     function displayLatestPicture() {
         const imageUrl = '/pictures/temp_img.jpg';
-        // Check if latestPictureImg element exists
-        if (latestPictureImg) {
-            // Append a timestamp to prevent caching if the image updates frequently
+        if (latestPictureImg && noPictureMessage) { // Ensure both elements are found
             latestPictureImg.src = `${imageUrl}?t=${new Date().getTime()}`;
-            latestPictureImg.style.display = 'block';
-            if (noPictureMessage) { // Check if noPictureMessage element exists
-                 noPictureMessage.style.display = 'none';
+
+            latestPictureImg.onload = () => {
+                latestPictureImg.style.display = 'block';
+                noPictureMessage.style.display = 'none';
+            };
+
+            latestPictureImg.onerror = () => {
+                latestPictureImg.style.display = 'none';
+                noPictureMessage.textContent = 'No picture available or picture failed to load.';
+                noPictureMessage.style.display = 'block';
+            };
+        } else {
+            // Fallback if elements are not found, though they are defined as constants
+            if (noPictureMessage) {
+                 noPictureMessage.textContent = "Image display components not found in HTML.";
+                 noPictureMessage.style.display = 'block';
             }
-        } else if (noPictureMessage) { // If image element doesn't exist, but message element does
-            noPictureMessage.textContent = "Latest picture display element not found.";
-            noPictureMessage.style.display = 'block';
+            console.error("latestPictureImg or noPictureMessage element not found.");
         }
     }
 
@@ -38,6 +53,28 @@ document.addEventListener('DOMContentLoaded', () => {
             // displayLatestPicture(); // Called at the end of DOMContentLoaded instead
         })
         .catch(error => console.error('Error fetching initial data:', error));
+
+    // Fetch initial global settings
+    if (debuggingEnvCheckbox && tumblrBlogNameInput && discordChannelNameInput) { // Ensure elements exist
+        fetch('/api/settings')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error fetching settings! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(settings => {
+                debuggingEnvCheckbox.checked = settings.debuggingEnv || false;
+                tumblrBlogNameInput.value = settings.tumblrBlogName || '';
+                discordChannelNameInput.value = settings.discordChannelName || '';
+            })
+            .catch(error => {
+                console.error('Error fetching global settings:', error);
+                appendLog(`Error fetching global settings: ${error.message}`);
+            });
+    } else {
+        console.warn('Global settings UI elements not found. Skipping fetch and population.');
+    }
 
     // SSE for logs
     const eventSource = new EventSource('/events');
@@ -284,6 +321,41 @@ document.addEventListener('DOMContentLoaded', () => {
     // Option 3: Client derives it (e.g., picture from the most recently active slot, or a designated "main" picture slot).
 
     displayLatestPicture(); // Call it on load
+
+    // Event listener for saving global settings
+    if (saveSettingsBtn && debuggingEnvCheckbox && tumblrBlogNameInput && discordChannelNameInput) {
+        saveSettingsBtn.addEventListener('click', () => {
+            const settingsData = {
+                debuggingEnv: debuggingEnvCheckbox.checked,
+                tumblrBlogName: tumblrBlogNameInput.value,
+                discordChannelName: discordChannelNameInput.value
+            };
+
+            fetch('/api/settings/save', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(settingsData)
+            })
+            .then(response => response.json().then(data => ({ status: response.status, body: data })))
+            .then(({ status, body }) => {
+                if (status === 200) {
+                    alert(body.message || "Global settings saved successfully.");
+                } else {
+                    let errorMessage = body.message || "Failed to save global settings.";
+                    if (body.errors) {
+                        errorMessage += "\n" + Object.values(body.errors).join("\n");
+                    }
+                    throw new Error(errorMessage);
+                }
+            })
+            .catch(error => {
+                console.error('Error saving global settings:', error);
+                alert(`Error saving global settings: ${error.message}`);
+            });
+        });
+    } else {
+        console.warn('#save-settings-btn or other settings UI elements not found. Global settings cannot be saved via UI.');
+    }
 
     // Potentially set an interval if the image is expected to change dynamically
     // and you want the UI to refresh it without a full page reload.

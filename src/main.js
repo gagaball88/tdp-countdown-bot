@@ -8,6 +8,36 @@ import { createConfigIfNeeded } from './config/config.js';
 import { createRequire } from "module";
 const require = createRequire(import.meta.url); // This might be removable if not used elsewhere
 
+// Global Error Handlers
+process.on('unhandledRejection', (reason, promise) => {
+    try {
+        const reasonMessage = reason instanceof Error ? reason.message : String(reason);
+        const reasonStack = reason instanceof Error ? reason.stack : 'No stack available.';
+        // It's hard to serialize a Promise reliably, so we'll focus on the reason.
+        logger(`[GLOBAL_HANDLER] Unhandled Rejection at: Promise, Reason: ${reasonMessage}
+Stack: ${reasonStack}`, 'CRITICAL');
+    } catch (loggingError) {
+        console.error(`[GLOBAL_HANDLER] CRITICAL: Failed to log Unhandled Rejection. Original reason: ${String(reason)}. Logging error: ${String(loggingError)}`);
+    }
+    // Consider whether to exit or not. For now, just log.
+    // process.exit(1); // Optional: exit application
+});
+
+process.on('uncaughtException', (error) => {
+    try {
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        const errorStack = error instanceof Error ? error.stack : 'No stack available.';
+        logger(`[GLOBAL_HANDLER] Uncaught Exception: ${errorMessage}
+Stack: ${errorStack}`, 'CRITICAL');
+    } catch (loggingError) {
+        console.error(`[GLOBAL_HANDLER] CRITICAL: Failed to log Uncaught Exception. Original error: ${String(error)}. Logging error: ${String(loggingError)}`);
+    }
+    // It's generally recommended to exit after an uncaught exception,
+    // as the application might be in an inconsistent state.
+    logger('[GLOBAL_HANDLER] Uncaught exception detected. Application will now exit.', 'CRITICAL');
+    process.exit(1);
+});
+
 createConfigIfNeeded('./config/config.json');
 
 // let config = require("./config/config.json"); // Removed as config is loaded by rescheduleAllFromConfig
