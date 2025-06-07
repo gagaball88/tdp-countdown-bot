@@ -61,7 +61,7 @@ async function extractImage(categories) {
 
     //Save the picture as a file
     fs.writeFileSync(filePath, picture.picture_data);
-    refreshData({ "type": "new_picture", "timestamp": new Date().getTime() });
+    refreshData(JSON.stringify({ "type": "new_picture", "timestamp": new Date().getTime() }));
 
     logger('INFO', `Image with ID ${picture.id} saved to ${filePath}`);
   } catch (error) {
