@@ -1,5 +1,23 @@
 # Changelog
 
+7.0.0_alpha
+
+**Features:**
+- Automatically create 'endings' subfolder for picture management (PR #7, PR #6, commit 086b3a8)
+- Implement dynamic cron rescheduling for tasks (commit b64b876)
+- Refactored Web UI for improved robustness, security, and maintainability (commit 3f1cc34)
+
+**Fixes:**
+- Prevent crash when a picture is not found and improve error handling (commit 652ca8b)
+- Add 'settings' section to config file structure (PR #4, commit a094241)
+- Correct saving of newly added slots in WebUI (PR #5, commit 3acdc07)
+- Correct WebUI paths for static files and index.html (PR #3, commit 87eeab3)
+- Correct logger method calls and standardize logger usage (PR #2, commit e249a46)
+- Corrected picture display logic (commit b64b876)
+
+**Documentation:**
+- Enhance README for greatly improved usability and setup clarity (commit 5ceb4fb)
+
 6.0.0
 
 - removed Threads support
