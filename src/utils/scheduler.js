@@ -4,7 +4,11 @@ import isOver from './isOver.js';
 import initPost from './initPost.js'; // Assuming initPost is correctly refactored to take all details
 import logger from './logger.js';
 import player from 'play-sound'; // For notifications, if any are kept in this part
+import path from 'path';
+import { fileURLToPath } from 'url';
+import { createRequire } from 'module';
 
+const require = createRequire(import.meta.url);
 let activeJobs = [];
 
 // Helper function (moved from taskPlanner.js)
@@ -157,6 +161,57 @@ export function cancelAllJobs() {
     activeJobs.forEach(job => job.stop());
     activeJobs = [];
 }
+
+export function rescheduleAllFromConfig() {
+    logger('[Scheduler] Starting to reschedule all jobs from configuration.', 'INFO');
+
+    const __filename = fileURLToPath(import.meta.url);
+    const __dirname = path.dirname(__filename);
+    const configPath = path.resolve(__dirname, '../config/config.json');
+
+    try {
+        // Clear the require cache for the config file
+        delete require.cache[require.resolve(configPath)];
+        // Re-require the config file
+        const config = require(configPath);
+
+        if (!config || !config.slots || !config.settings) {
+            logger('[Scheduler] Configuration file is invalid or missing required sections (slots, settings).', 'ERROR');
+            return;
+        }
+
+        const globalConfig = {
+            debuggingEnv: config.settings.debuggingEnv || false,
+            tumblrBlogName: config.settings.tumblrBlogName || "",
+            discordChannelName: config.settings.discordChannelName || ""
+            // Add any other global settings from config.settings needed by scheduleSlot or performPostAction
+        };
+
+        if (!globalConfig.tumblrBlogName) {
+            logger('[Scheduler] Tumblr Blog Name is not configured in settings. Some functionalities might be affected.', 'WARN');
+        }
+        if (!globalConfig.discordChannelName) {
+            logger('[Scheduler] Discord Channel Name is not configured in settings. Some functionalities might be affected.', 'WARN');
+        }
+
+        cancelAllJobs();
+
+        config.slots.forEach(slot => {
+            if (slot) { // Basic check for null/undefined slots
+                scheduleSlot(slot, globalConfig);
+            } else {
+                logger('[Scheduler] Encountered an invalid slot entry in configuration. Skipping.', 'WARN');
+            }
+        });
+
+        logger('[Scheduler] Rescheduling all jobs complete.', 'INFO');
+
+    } catch (error) {
+        logger(`[Scheduler] Error during rescheduleAllFromConfig: ${String(error)}`, 'ERROR');
+        // player().play('./sounds/error.mp3'); // Optional: Play error sound
+    }
+}
+
 
 // Example of how logger.error might be used for sound, if desired, though initPost handles its own.
 // process.on('unhandledRejection', error => {

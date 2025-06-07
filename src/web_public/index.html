@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebUI</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>WebUI</h1>
+
+    <div id="picture-section">
+        <h2>Latest Picture</h2>
+        <img id="latest-picture" src="" alt="Latest Picture" style="max-width: 500px; display: none;">
+        <p id="no-picture-message">No picture available yet.</p>
+    </div>
+
+    <div id="logs-section">
+        <h2>Logs</h2>
+        <div id="logs-container"></div>
+    </div>
+
+    <div id="slots-section">
+        <h2>Configuration Slots</h2>
+        <div id="slots-container">
+            <!-- Slots will be dynamically added here -->
+        </div>
+        <button id="add-slot-btn">Add New Slot</button>
+    </div>
+
+    <!-- Modal for editing/creating a slot -->
+    <div id="slot-modal" style="display:none;">
+        <div class="modal-content">
+            <span class="close-btn">&times;</span>
+            <h3>Slot Configuration</h3>
+            <input type="hidden" id="slot-index">
+            <label for="slot-hour">Hour (0-23):</label>
+            <input type="number" id="slot-hour" min="0" max="23"><br>
+            <label for="slot-day">Day (1-31):</label>
+            <input type="number" id="slot-day" min="1" max="31"><br>
+            <label for="slot-month">Month (1-12):</label>
+            <input type="number" id="slot-month" min="1" max="12"><br>
+            <label for="slot-year">Year:</label>
+            <input type="number" id="slot-year"><br>
+            <label for="slot-accuracy">Accuracy (0-5):</label>
+            <input type="number" id="slot-accuracy" min="0" max="5"><br>
+            <label for="slot-postTime">Post Time (0-23):</label>
+            <input type="number" id="slot-postTime" min="0" max="23"><br>
+            <label for="slot-active">Active:</label>
+            <input type="checkbox" id="slot-active"><br>
+            <label for="slot-dayCount">Day Count:</label>
+            <input type="checkbox" id="slot-dayCount"><br>
+            <label for="slot-message1">Message 1:</label>
+            <textarea id="slot-message1"></textarea><br>
+            <label for="slot-message2">Message 2:</label>
+            <textarea id="slot-message2"></textarea><br>
+            <label for="slot-mode">Mode (countdown/countup):</label>
+            <input type="text" id="slot-mode"><br>
+            <label for="slot-messageEnd">Message End:</label>
+            <textarea id="slot-messageEnd"></textarea><br>
+            <label for="slot-pictureEnd">Picture End (filename):</label>
+            <input type="text" id="slot-pictureEnd"><br>
+            <label for="slot-pictureSlot">Picture Slot (filename):</label>
+            <input type="text" id="slot-pictureSlot"><br>
+            <button id="save-slot-btn">Save Slot</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

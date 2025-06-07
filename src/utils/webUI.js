@@ -3,6 +3,8 @@ import express from 'express';
 import bodyParser from 'body-parser';
 import fs from 'fs';
 import path from 'path'; // Added path import
+import { fileURLToPath } from 'url'; // Added for ES module __dirname equivalent
+import { rescheduleAllFromConfig } from './scheduler.js'; // Import reschedule function
 
 // escapeHtml can be removed if not used anywhere else on server-side
 // function escapeHtml(unsafe) { ... } 
@@ -13,7 +15,9 @@ var clients = [];
 
 const app = express();
 const PORT = 8080;
-const configPath = './config/config.json'; // Define configPath once
+const __filename = fileURLToPath(import.meta.url); // ES module __filename
+const __dirname = path.dirname(__filename); // ES module __dirname
+const configPath = path.resolve(__dirname, '../config/config.json'); // Define configPath once
 
 export async function startServer() {
     // Serve static files from web_public first
@@ -65,6 +69,7 @@ export async function startServer() {
     // and don't rely on a potentially stale 'config' variable from startServer scope.
 
     app.post("/saveSlot/:index", (req, res) => {
+        logger(`Received body for saveSlot: ${JSON.stringify(req.body)}`, 'DEBUG'); // New logging line
         const index = parseInt(req.params.index, 10);
         let currentConfig;
         try {
@@ -100,8 +105,10 @@ export async function startServer() {
         const postTimeValue = parseInt(rawPostTime, 10); // Renamed to avoid conflict
         if (isNaN(postTimeValue) || postTimeValue < 0 || postTimeValue > 23) errors.postTime = "Post Time must be a number between 0 and 23.";
 
-        if (typeof message1 !== 'string' || message1.trim() === "") errors.message1 = "Message 1 is required.";
-        if (typeof message2 !== 'string' || message2.trim() === "") errors.message2 = "Message 2 is required.";
+        if (typeof message1 !== 'string') errors.message1 = "Message 1 must be a string.";
+        // Allow message1 to be empty
+        if (typeof message2 !== 'string') errors.message2 = "Message 2 must be a string.";
+        // Allow message2 to be empty
         if (typeof mode !== 'string' || !['countdown', 'countup'].includes(mode.toLowerCase())) errors.mode = "Mode must be 'countdown' or 'countup'.";
 
         const active = String(rawActive).toLowerCase() === "true" || rawActive === true;
@@ -127,6 +134,9 @@ export async function startServer() {
                 return res.status(500).json({ message: "Failed to save slot configuration.", error: err.message });
             }
             res.json({ message: "Slot saved successfully." });
+            // After sending response, trigger rescheduling
+            logger("[WebUI] Config changed via /saveSlot. Triggering scheduler update.", "INFO");
+            rescheduleAllFromConfig();
         });
     });
 
@@ -151,6 +161,9 @@ export async function startServer() {
                 return res.status(500).json({ message: "Failed to delete slot.", error: err.message });
             }
             res.json({ message: "Slot deleted successfully." });
+            // After sending response, trigger rescheduling
+            logger("[WebUI] Config changed via /deleteSlot. Triggering scheduler update.", "INFO");
+            rescheduleAllFromConfig();
         });
     });
 
@@ -177,10 +190,13 @@ export async function startServer() {
                 logger("Error writing config file for /addSlot: " + String(err), 'ERROR');
                 return res.status(500).json({ message: "Failed to add new slot.", error: err.message });
             }
-            res.json({
+            res.json({ // Send response to client
                 message: "New slot added successfully.",
                 index: currentConfig.slots.length - 1
             });
+            // After sending response, trigger rescheduling
+            logger("[WebUI] Config changed via /addSlot. Triggering scheduler update.", "INFO");
+            rescheduleAllFromConfig(); // Call the imported function
         });
     });
 

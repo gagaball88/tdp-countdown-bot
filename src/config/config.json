@@ -1,5 +1,9 @@
 {
-  "debuggingEnv": true,
+  "settings": {
+    "debuggingEnv": true,
+    "tumblrBlogName": "",
+    "discordChannelName": ""
+  },
   "slots": [
     {
       "hour": 9,
