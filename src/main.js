@@ -11,7 +11,7 @@ const require = createRequire(import.meta.url);
 createConfigIfNeeded('./config/config.json');
 
 let config = require("./config/config.json");
-logger("Config file loaded");
+logger("Config file loaded", 'INFO');
 
 function updateVariables() {
 
@@ -37,11 +37,11 @@ function updateVariables() {
 ///Initialization
 
 console.log("To quit, press ESC or Ctrl-C\n\n");
-logger("Bot started successfully\n");
+logger("Bot started successfully\n", 'INFO');
 try {
     player().play('./sounds/start.mp3');
 } catch (e) {
-    logger.error("Failed to play startup sound './sounds/start.mp3'", e);
+    logger("Failed to play startup sound './sounds/start.mp3' " + String(e), 'ERROR');
 }
 startServer();
 
@@ -56,7 +56,7 @@ updateVariables()
 
 setInterval(() => {
     uptime = uptime + 12;
-    logger("Everything's working fine for " + uptime + " hours now :)");
+    logger("Everything's working fine for " + uptime + " hours now :)", 'INFO');
 }, 12 * 60 * 60 * 1000)
 
 // setInterval(() => {
