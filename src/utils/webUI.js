@@ -17,7 +17,7 @@ const configPath = './config/config.json'; // Define configPath once
 
 export async function startServer() {
     // Serve static files from web_public first
-    app.use(express.static(path.resolve('src/web_public')));
+    app.use(express.static(path.resolve('../src/web_public')));
     // Serve static pictures from top-level 'pictures' directory
     app.use('/pictures', express.static(path.resolve('pictures')));
 
@@ -26,7 +26,7 @@ export async function startServer() {
 
     // Root route serves the main HTML file
     app.get("/", (req, res) => {
-        res.sendFile(path.resolve('src/web_public/index.html'));
+        res.sendFile(path.resolve('../src/web_public/index.html'));
     });
 
     // API endpoint to provide initial data for the client-side script
