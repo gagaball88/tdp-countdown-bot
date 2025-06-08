@@ -28,7 +28,7 @@
 
         <div id="picture-section">
             <h2>Latest Picture</h2>
-            <img id="latest-picture" src="" alt="Latest Picture" style="max-width: 500px; display: none;">
+            <img id="latest-picture" src="" alt="Latest Picture">
             <p id="no-picture-message">No picture available yet.</p>
         </div>
     </div>
@@ -43,12 +43,27 @@
 
     <div id="global-settings-section">
         <h2>Global Settings</h2>
-        <label for="debuggingEnv">Debugging Environment:</label>
-        <input type="checkbox" id="debuggingEnv"><br>
-        <label for="tumblrBlogName">Tumblr Blog Name:</label>
-        <input type="text" id="tumblrBlogName" size="30"><br>
-        <label for="discordChannelName">Discord Channel Name:</label>
-        <input type="text" id="discordChannelName" size="30"><br>
+        <div class="setting-item">
+            <label for="debuggingEnv">Debugging Environment:</label>
+            <input type="checkbox" id="debuggingEnv">
+        </div>
+        <div class="setting-item">
+            <label for="tumblrBlogName">Tumblr Blog Name:</label>
+            <input type="text" id="tumblrBlogName">
+        </div>
+        <div class="setting-item">
+            <label for="discordChannelName">Discord Channel Name:</label>
+            <input type="text" id="discordChannelName">
+        </div>
+        <div class="setting-item">
+            <label for="logLevel">Log Level:</label>
+            <select id="logLevel">
+                <option value="DEBUG">Debug</option>
+                <option value="INFO">Info</option>
+                <option value="WARN">Warning</option>
+                <option value="ERROR">Error</option>
+            </select>
+        </div>
         <button id="save-settings-btn">Save Global Settings</button>
     </div>
 
