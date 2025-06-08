@@ -10,22 +10,26 @@ h1, h2, h3 {
 }
 
 #top-content-wrapper {
-    display: flex;
-    flex-wrap: wrap; /* Allows items to wrap to the next line on smaller screens */
+    display: grid;
+    grid-template-columns: 1fr 1fr;
     gap: 20px; /* Adds space between flex items */
     margin-bottom: 20px;
 }
 
 #logs-section {
-    flex: 1; /* Allows the logs section to grow and shrink */
+    /* flex: 1; Removed */
     min-width: 300px; /* Minimum width before wrapping */
     /* order: 1; /* Explicitly first, though default by source order */
+    display: flex; /* Existing internal flex layout */
+    flex-direction: column; /* Existing internal flex layout */
+    min-height: 0; /* Added */
 }
 
 #picture-section {
-    flex: 1; /* Allows the picture section to grow and shrink */
+    /* flex: 1; Removed */
     min-width: 300px; /* Minimum width before wrapping */
     /* order: 2; /* Explicitly second, though default by source order */
+    min-height: 0; /* Added */
 }
 
 #picture-section, #logs-section, #slots-section, #global-settings-section {
@@ -54,11 +58,13 @@ h1, h2, h3 {
 }
 
 #logs-container {
-    height: 200px;
-    overflow-y: scroll;
-    border: 1px solid #ddd;
-    padding: 10px;
-    background-color: #e9e9e9;
+    min-height: 200px; /* Changed from height: 200px */
+    overflow-y: scroll; /* Existing */
+    border: 1px solid #ddd; /* Existing */
+    padding: 10px; /* Existing */
+    background-color: #e9e9e9; /* Existing */
+    flex-grow: 1; /* Added */
+    height: 0;            /* Added */
 }
 
 #logs-container div {
@@ -301,12 +307,14 @@ input:checked + .slider:before {
 /* Media Query for smaller screens */
 @media (max-width: 768px) { /* Adjust breakpoint as needed */
     #top-content-wrapper {
+        display: flex; /* Ensure flex behavior on mobile */
         flex-direction: column;
     }
 
-    #logs-section, #picture-section {
+    #logs-section, #picture-section, #slots-section, #global-settings-section {
         width: 100%; /* Full width for stacked items */
         margin-bottom: 20px; /* Add margin between stacked items */
+        box-sizing: border-box; /* Include padding and border in the element's total width and height */
     }
 
     #logs-section {
@@ -316,4 +324,57 @@ input:checked + .slider:before {
     #picture-section {
         order: 2; /* Picture section second */
     }
+
+    #latest-picture {
+        max-width: 100%; /* Ensures image scales down within its container on mobile */
+    }
+}
+
+#latest-picture {
+    width: 100%; /* Changed from max-width: 500px */
+    height: auto; /* Added to maintain aspect ratio */
+    display: block; /* Added for better layout control, will be overridden by script if no image */
+    margin-left: auto; /* For centering if block */
+    margin-right: auto; /* For centering if block */
+}
+
+/* Styles for Global Settings Section */
+#global-settings-section .setting-item {
+    margin-bottom: 15px; /* Space between setting items */
+    display: flex; /* Align label and input on the same line */
+    align-items: center; /* Vertically align items in the flex container */
+    flex-wrap: wrap; /* Allow items to wrap on small screens if necessary */
+}
+
+#global-settings-section .setting-item label {
+    margin-right: 10px; /* Space between label and input */
+    flex-basis: 200px; /* Give label a consistent width */
+    flex-shrink: 0; /* Prevent label from shrinking */
+}
+
+#global-settings-section .setting-item input[type="text"],
+#global-settings-section .setting-item select {
+    flex-grow: 1; /* Allow input/select to take remaining space */
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-sizing: border-box;
+    min-width: 200px; /* Minimum width for inputs/select */
+}
+
+#global-settings-section .setting-item input[type="checkbox"] {
+    /* Using default browser styling for checkbox, can be enhanced later if needed */
+    /* margin-left: 0; ensure it aligns well if a specific layout is chosen */
+}
+
+#global-settings-section #save-settings-btn {
+     margin-top: 10px;
+}
+
+/* Dark mode considerations for select element (ensure it's comprehensive) */
+body.dark-mode #global-settings-section .setting-item input[type="text"],
+body.dark-mode #global-settings-section .setting-item select {
+    background-color: #666;
+    color: #f4f4f4;
+    border: 1px solid #888;
 }
